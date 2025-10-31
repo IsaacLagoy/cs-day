@@ -1,12 +1,13 @@
 <script>
   import { connect, connection, send } from '$lib/ws';
   import { get } from 'svelte/store';
+  import { onMount } from 'svelte';
 
   let ws;
 
   onMount(() => {
     ws = connect('host');
-  });
+    });
 
   function startGame() {
     send(get(connection), 'hostCommand', { start: true });
