@@ -121,12 +121,28 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
     });
 
     // Cleanup function
-    function disconnect(): void {
-        console.log('Disconnecting client', id);
-        channel.untrack();
-        channel.unsubscribe();
+    async function disconnect(): Promise<void> {
+      console.log('Disconnecting client', id);
+      try {
+        await Promise.allSettled([
+          channel.untrack(),
+          channel.unsubscribe()
+        ]);
+      } finally {
         activeChannels.delete(id);
+        if (activeChannels.size === 0) {
+          await supabase.removeAllChannels();
+        }
+      }
     }
+
+    if (typeof window !== 'undefined') {
+      const handleVisibility = async () => {
+        if (document.visibilityState === 'hidden') await disconnect();
+      };
+      document.addEventListener('visibilitychange', handleVisibility);
+    }
+
 
     // Handle page unload
     if (typeof window !== 'undefined') {
