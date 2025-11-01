@@ -5,11 +5,17 @@ import type { ButtonConfig } from '$lib/types';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
+<<<<<<< HEAD
 const NUM_SCENES = 25;
+=======
+const NUM_SCENES = 19;
+>>>>>>> ac59f0495a4ed2a126cc32b2cfb3c7d23eb45062
 
 export class HostLogic {
   ws: WebSocketConnection | undefined;
   buttonConfig: Writable<ButtonConfig[]>;
+  private lastProcessedRequestCount: number = 0;
+  private unsubscribeMessages: (() => void) | undefined;
 
   level: number = 0;
   slide: number = 0;
@@ -17,30 +23,66 @@ export class HostLogic {
   scene: number = 0;
 
   constructor() {
-        // Initialize default button configuration
-        this.buttonConfig = writable([
-            { name: 'left', enabled: true },
-            { name: 'right', enabled: true },
-            { name: 'jump', enabled: false },
-            { name: 'a', enabled: false },
-            { name: 'b', enabled: false }
-        ]);
+    // Initialize default button configuration
+    this.buttonConfig = writable([
+      { name: 'left', enabled: true },
+      { name: 'right', enabled: true },
+      { name: 'jump', enabled: true },
+      { name: 'a', enabled: true },
+      { name: 'b', enabled: true }
+    ]);
   }
 
   connect(): void {
     if (!this.ws) {
       this.ws = connect('host');
 
-      // Send initial button config when connected
-      this.buttonConfig.subscribe(config => {
+      // Send initial button config once after connection is established
+      // Use a timeout to ensure the WebSocket channel is fully subscribed
+      setTimeout(() => {
         if (this.ws) {
-          this.ws.sendButtonConfig(config);
+          // Get current config value without subscribing
+          let currentConfig: ButtonConfig[] = [];
+          const unsubscribe = this.buttonConfig.subscribe(config => {
+            currentConfig = config;
+          });
+          unsubscribe(); // Immediately unsubscribe
+          
+          console.log('[HostLogic] Sending initial button config:', currentConfig);
+          this.ws.sendButtonConfig(currentConfig);
         }
-      });
+      }, 500);
+
+      // Listen for button config requests from new controllers
+      this.setupConfigRequestListener();
     }
   }
 
+  private setupConfigRequestListener(): void {
+    // Import messages store to listen for requests
+    import('$lib/realtime').then(({ messages }) => {
+      messages.subscribe($messages => {
+        // Look for buttonConfigRequest messages
+        const requests = $messages.filter(msg => msg.type === 'buttonConfigRequest');
+        
+        // If we have any requests, send current config
+        if (requests.length > 0 && this.ws) {
+          // Get current config
+          let currentConfig: ButtonConfig[] = [];
+          const unsubscribe = this.buttonConfig.subscribe(config => {
+            currentConfig = config;
+          });
+          unsubscribe();
+          
+          console.log('[HostLogic] Received button config request, sending current config:', currentConfig);
+          this.ws.sendButtonConfig(currentConfig);
+        }
+      });
+    });
+  }
+
   toggleButton(buttonName: string): void {
+    console.log('[HostLogic] Toggling button:', buttonName);
     this.buttonConfig.update(config => {
       const updated = config.map(btn => 
         btn.name === buttonName 
@@ -48,9 +90,13 @@ export class HostLogic {
           : btn
       );
       
+      console.log('[HostLogic] New config after toggle:', updated);
+      
       // Broadcast the updated config
       if (this.ws) {
         this.ws.sendButtonConfig(updated);
+      } else {
+        console.warn('[HostLogic] Cannot send config - WebSocket not connected');
       }
       
       return updated;
