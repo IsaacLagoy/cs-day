@@ -49,7 +49,7 @@ export class Player extends GameObject {
     }
 
     respawn() {
-        this.position = { x: -7.5, y: 0 };
+        this.position = { x: -7.5, y: 7.5 };
         this.vel = { x: 0, y: 0};
     }
 }

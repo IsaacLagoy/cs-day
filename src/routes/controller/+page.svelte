@@ -1,48 +1,18 @@
-<script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { clientId } from '$lib/realtime';
-  import { ControllerLogic } from './controller.logic';
-  import type { ButtonName } from './controller.logic';
-
-  const controller = new ControllerLogic();
-  const { buttonStates, buttonConfig } = controller;
-
-  onMount(() => {
-    const savedId = localStorage.getItem('clientId');
-    controller.connect(savedId ?? undefined);
-  });
-
-  onDestroy(() => {
-    controller.destroy();
-  });
-
-  function handleButtonDown(button: ButtonName) {
-    controller.handleButtonDown(button);
-  }
-
-  function handleButtonUp(button: ButtonName) {
-    controller.handleButtonUp(button);
-  }
-
-  function isButtonEnabled(buttonName: string): boolean {
-    const button = $buttonConfig.find(b => b.name === buttonName);
-    return button ? button.enabled : false;
-  }
-</script>
-
 <div class="container">
-  <h1>Controller</h1>
-  <p class="client-info">Your client ID: {$clientId}</p>
+  <h1>Your Color</h1>
+  {#if $clientId}
+    <div class="color-box" style="background-color: {color};">
+
+    </div>
+  {:else}
+    <p>Loading color...</p>
+  {/if}
 
   <div class="controller-pad">
     <!-- LEFT SIDE: left & right (D-Pad style, but only left/right exist) -->
     <div class="button-layout dpad-left" aria-hidden="true">
-      <!-- top-left empty -->
-      <div></div>
-      <div></div>
-      <div></div>
+      <div></div><div></div><div></div>
 
-      <!-- middle row: left at col1, center empty, right at col3 -->
       {#if isButtonEnabled('left')}
         <button
           class="button arrow-button left {$buttonStates.left ? 'pressed' : ''}"
@@ -71,15 +41,11 @@
         <div></div>
       {/if}
 
-      <!-- bottom row empty -->
-      <div></div>
-      <div></div>
-      <div></div>
+      <div></div><div></div><div></div>
     </div>
 
-    <!-- RIGHT SIDE: Jump (up) above A & B (jump is the 'up' on the right controller) -->
+    <!-- RIGHT SIDE: Jump (up) above A & B -->
     <div class="button-layout actions-right" role="group" aria-label="Action buttons">
-      <!-- row 1: jump centered -->
       <div></div>
       {#if isButtonEnabled('jump')}
         <button
@@ -95,7 +61,6 @@
       {/if}
       <div></div>
 
-      <!-- row 2: place B (left) and A (right) -->
       {#if isButtonEnabled('b')}
         <button
           id="btn-b"
@@ -126,15 +91,61 @@
         <div></div>
       {/if}
 
-      <!-- row 3: empty -->
-      <div></div>
-      <div></div>
-      <div></div>
+      <div></div><div></div><div></div>
     </div>
   </div>
 </div>
 
+<script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
+  import { clientId } from '$lib/realtime';
+  import { ControllerLogic } from './controller.logic';
+  import type { ButtonName } from './controller.logic';
+
+  const controller = new ControllerLogic();
+  const { buttonStates, buttonConfig } = controller;
+
+  onMount(() => {
+    const savedId = localStorage.getItem('clientId');
+    controller.connect(savedId ?? undefined);
+  });
+
+  onDestroy(() => {
+    controller.destroy();
+  });
+
+  function handleButtonDown(button: ButtonName) {
+    controller.handleButtonDown(button);
+  }
+
+  function handleButtonUp(button: ButtonName) {
+    controller.handleButtonUp(button);
+  }
+
+  function isButtonEnabled(buttonName: string): boolean {
+    const button = $buttonConfig.find(b => b.name === buttonName);
+    return button ? button.enabled : false;
+  }
+
+  // reactive color variable (without $ prefix)
+  $: color = $clientId ? '#' + $clientId.slice(0, 6) : '#000000';
+</script>
+
 <style>
+  .color-box {
+    width: 200px;
+    height: 100px;
+    border-radius: 12px;
+    border: 2px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 12px;
+    text-shadow: 0 0 2px rgba(0,0,0,0.7);
+  }
+
   /* base page reset */
   html, body {
     margin: 0;

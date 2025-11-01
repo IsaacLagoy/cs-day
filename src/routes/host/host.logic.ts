@@ -13,6 +13,7 @@ export class HostLogic {
   level: number = 0;
   slide: number = 0;
   mode: string = 'none';
+  scene: number = 0;
 
   constructor() {
         // Initialize default button configuration
