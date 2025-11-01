@@ -63,6 +63,15 @@ export class HostLogic {
     this.ws.send({ [name]: value });
   }
 
+  resetLevel(): void {
+    if (!this.ws) {
+      console.warn('WebSocket not connected');
+      return;
+    }
+    this.level = 0;
+    this.setFlag('level', this.level);
+  }
+
   incLevel(): void {
     if (!this.ws) {
       console.warn('WebSocket not connected');
@@ -79,6 +88,15 @@ export class HostLogic {
     }
     this.level--;
     this.setFlag('level', this.level);
+  }
+
+  resetSlide(): void {
+    if (!this.ws) {
+      console.warn('WebSocket not connected');
+      return;
+    }
+    this.slide = 0;
+    this.setFlag('slide', this.slide);
   }
 
   incSlide(): void {

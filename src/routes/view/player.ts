@@ -1,8 +1,6 @@
 import type { vec2, AABB } from '$lib/types'
 import { GameObject } from './game_object'
 
-let unit = 100;
-
 export class Player extends GameObject {
     clientId: string;
     role: string;
