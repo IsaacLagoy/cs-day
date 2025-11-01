@@ -8,13 +8,19 @@ let ctx: CanvasRenderingContext2D;
 let controllerInstance: GameViewController;
 let lastTime = 0;
 let slide_1: HTMLImageElement;
-
+let slide_2: HTMLImageElement;
+let slide_list: Array<HTMLImageElement>;
 
 // Load assets
 if (typeof window !== 'undefined') {
   slide_1 = new Image();
   slide_1.src = '/src/lib/assets/slide-1.png'; 
+  slide_2 = new Image();
+  slide_2.src = '/src/lib/assets/slide-2.png'; 
+
+  slide_list = [slide_1, slide_2];
 }
+
 
 // Initialize the canvas and start the game loop
 export function init(c: HTMLCanvasElement, controller: GameViewController) {
@@ -58,7 +64,7 @@ function draw() {
   });
 }
 
-function drawBackground() {
+function drawBackground(image: HTMLImageElement) {
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
 
@@ -81,7 +87,7 @@ function drawBackground() {
     offsetY = (canvasHeight - drawHeight) / 2;
   }
 
-  ctx.drawImage(slide_1, offsetX, offsetY, drawWidth, drawHeight);
+  ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 }
 
 
@@ -96,8 +102,9 @@ function loop(time: number) {
   ctx.fillStyle = '#111';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  drawBackground();
-  
+
+  drawBackground(slide_list[0]);
+
   draw();
 
 
