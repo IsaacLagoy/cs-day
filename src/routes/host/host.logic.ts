@@ -5,11 +5,7 @@ import type { ButtonConfig } from '$lib/types';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
-<<<<<<< HEAD
 const NUM_SCENES = 25;
-=======
-const NUM_SCENES = 19;
->>>>>>> ac59f0495a4ed2a126cc32b2cfb3c7d23eb45062
 
 export class HostLogic {
   ws: WebSocketConnection | undefined;
