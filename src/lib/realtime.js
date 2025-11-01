@@ -3,42 +3,86 @@ import { writable } from 'svelte/store';
 import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 
-const SUPABASE_URL = PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = PUBLIC_SUPABASE_ANON_KEY;
-
 export const messages = writable([]);
 export const clientId = writable(null);
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+export const connectedClients = writable([]); // all connected clients
 
-export function connect(role) {
+const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
+
+export function connect(role, existingId = null) {
   const channel = supabase.channel('game');
 
-  // Save a simple client ID
-  const id = crypto.randomUUID();
+  const id = existingId || crypto.randomUUID();
   clientId.set(id);
 
-  // Listen for messages from all clients
-  channel.on('broadcast', { event: 'message' }, (payload) => {
-    // payload.payload is the object sent by send()
-    messages.update((m) => [...m, payload.payload]);
-    console.log('Received message:', payload.payload);
-  });
+  // Persist if it’s new
+  if (!existingId && typeof window !== 'undefined') {
+    localStorage.setItem('clientId', id);
+  }
 
-  channel.subscribe((status) => {
-    console.log(`Supabase channel status: ${status}`);
-    if (status === 'SUBSCRIBED') {
-      console.log(`Connected to Supabase Realtime as ${role}`);
+  // Broadcast join message
+  function announceJoin() {
+    channel.send({
+      type: 'broadcast',
+      event: 'message',
+      payload: { type: 'clientJoined', clientId: id, role }
+    });
+  }
+
+  // Broadcast leave on unload
+  function announceLeave() {
+    channel.send({
+      type: 'broadcast',
+      event: 'message',
+      payload: { type: 'clientLeft', clientId: id }
+    });
+  }
+
+  // Listen for messages
+  channel.on('broadcast', { event: 'message' }, (payload) => {
+    const msg = payload.payload;
+
+    console.log('Received broadcast:', msg); // debug log
+
+    // Update general message store
+    messages.update((m) => [...m, msg]);
+
+    // Handle join
+    if (msg.type === 'clientJoined') {
+      connectedClients.update((c) => {
+        if (!c.find((x) => x.clientId === msg.clientId))
+          return [...c, { clientId: msg.clientId, role: msg.role }];
+        return c;
+      });
+    }
+
+    // Handle leave
+    if (msg.type === 'clientLeft') {
+      connectedClients.update((c) =>
+        c.filter((x) => x.clientId !== msg.clientId)
+      );
     }
   });
 
-  // Send a message
+  channel.subscribe((status) => {
+    console.log('Supabase channel status:', status);
+    if (status === 'SUBSCRIBED') {
+      console.log(`Connected to Supabase Realtime as ${role}`);
+      announceJoin(); // announce join once subscribed
+    }
+  });
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', () => announceLeave());
+  }
+
   function send(gameStateUpdate) {
     channel.send({
       type: 'broadcast',
       event: 'message',
-      payload: { clientId: id, role, gameState: gameStateUpdate }
+      payload: { type: 'gameUpdate', clientId: id, role, gameState: gameStateUpdate }
     });
   }
 
-  return { send };
+  return { send, clientId: id };
 }
