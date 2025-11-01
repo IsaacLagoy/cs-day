@@ -120,7 +120,7 @@ if (typeof window !== 'undefined') {
   level_5.add(level_5_floor_right);
   level_5.add(level_5_platform);
 
-  level_list = [test_level, level_1, level_2, level_3, level_4, level_5, null];
+  level_list = [level_1, level_2, level_3, level_4, level_5, null];
 }
 
 
@@ -156,8 +156,10 @@ function update(deltaTime: number) {
   const levelChange = prev_level != level;
   prev_level = level;
 
+  const do_gravity = gameState.mode === "platformer";
+
   Object.values(currentPlayers).forEach(player => {
-    player.update(deltaTime)
+    player.update(deltaTime, do_gravity);
 
     const gameState = get(controllerInstance.gameState);
     let level = gameState.level;

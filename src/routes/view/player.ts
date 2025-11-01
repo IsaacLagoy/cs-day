@@ -21,12 +21,12 @@ export class Player extends GameObject {
         this.inputs = {};
     }
 
-    update(deltaTime: number) {
+    update(deltaTime: number, do_gravity: boolean = true) {
         this.vel.x = this.speed * (Number(Boolean(this.inputs["right"])) - Number(Boolean(this.inputs["left"])));
 
-        this.vel.y -= deltaTime * GRAVITY;
+        if (do_gravity) this.vel.y -= deltaTime * GRAVITY;
 
-        if (this.inputs['jump'] && this.canJump) {
+        if (this.inputs['jump'] && this.canJump && do_gravity) {
             this.vel.y += JUMP_HEIGHT;
             this.canJump = false;
         }
