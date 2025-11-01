@@ -34,24 +34,28 @@ export interface GameUpdateMessage extends BaseMessage {
 }
 
 export interface ButtonConfig {
-    id: string;
-    label: string;
+    name: string;
     enabled: boolean;
-    color?: string;
 }
 
-export interface ButtonConfigMessage extends BaseMessage {
+export interface ButtonConfigMessage {
     type: 'buttonConfig';
+    clientId: string;
     role: string;
     buttons: ButtonConfig[];
 }
 
-export interface ButtonConfigRequestMessage extends BaseMessage {
+export interface ButtonConfigRequestMessage {
     type: 'buttonConfigRequest';
+    clientId: string;
     role: string;
 }
 
-export type Message = ClientJoinedMessage | ClientLeftMessage | GameUpdateMessage | PlayerInputMessage | ButtonConfigMessage | ButtonConfigRequestMessage;
+export type Message = 
+    | GameUpdateMessage 
+    | PlayerInputMessage 
+    | ButtonConfigMessage 
+    | ButtonConfigRequestMessage;
 
 /* Physics */
 export interface vec2 {

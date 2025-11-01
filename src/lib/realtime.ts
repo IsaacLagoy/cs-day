@@ -77,6 +77,13 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
 
     channel.on('presence', { event: 'join' }, ({ key, newPresences }) => {
         console.log('Client joined:', newPresences);
+        
+        // If a controller joins and we're the host, send them the button config
+        const joinedClient = newPresences[0] as any;
+        if (role === 'host' && joinedClient?.role === 'controller') {
+            // The host will need to send the current button config
+            // This will be handled by the host's subscription to buttonConfig
+        }
     });
 
     channel.on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
@@ -88,6 +95,12 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
         const msg: Message = payload.payload;
         console.log('Received broadcast:', msg);
         messages.update((m) => [...m, msg]);
+        
+        // If we're a host and receive a button config request, respond with current config
+        if (msg.type === 'buttonConfigRequest' && role === 'host') {
+            // The host should respond - this will be handled by host logic
+            console.log('Received button config request from', msg.clientId);
+        }
     });
 
     let isSubscribed = false;

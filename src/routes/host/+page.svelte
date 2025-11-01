@@ -3,6 +3,7 @@
     import { HostLogic } from './host.logic';
 
     const host = new HostLogic();
+    const { buttonConfig } = host;
 
     onMount(() => {
         host.connect();
@@ -19,12 +20,12 @@
 
     function incSlide(): void { host.incSlide(); }
     function decSlide(): void { host.decSlide(); }
+
+    function toggleButton(buttonName: string) { host.toggleButton(buttonName); }
 </script>
 
 <h1>Host Controls</h1>
 
-<h2>Game Settings</h2>
-<hr>
 <h3>Mode</h3>
 
 <button on:click={() => setMode('none')}>Set Mode None</button>
@@ -43,5 +44,80 @@
 <button on:click={() => decLevel()}>Level Backward</button>
 <button on:click={() => incLevel()}>Level Forward</button>
 
+<div class="container">
+    <div class="section">
+        <h2>Button Configuration</h2>
+        <p>Toggle buttons on/off for all controllers:</p>
+        <div class="button-controls">
+            {#each $buttonConfig as button}
+                <div class="button-toggle">
+                    <span style="font-size: 16px; text-transform: capitalize;">
+                        {button.name}
+                    </span>
+                    <button 
+                        class="toggle-btn {button.enabled ? 'enabled' : 'disabled'}"
+                        on:click={() => toggleButton(button.name)}
+                    >
+                        {button.enabled ? 'Enabled' : 'Disabled'}
+                    </button>
+                </div>
+            {/each}
+        </div>
+    </div>
+</div>
 
-<h2>Player Settings</h2>
+
+<style>
+    .container {
+        padding: 20px;
+        max-width: 600px;
+    }
+
+    .section {
+        margin-bottom: 30px;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+    }
+
+    .button-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .button-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        background: #f5f5f5;
+        border-radius: 5px;
+    }
+
+    .toggle-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.2s;
+    }
+
+    .toggle-btn.enabled {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .toggle-btn.disabled {
+        background-color: #f44336;
+        color: white;
+    }
+
+    .game-controls button {
+        margin-right: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+</style>
+

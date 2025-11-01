@@ -13,7 +13,11 @@ export class GameViewController {
   playerInputs: Readable<PlayerInputMessage[]>;
 
   constructor() {
-    this.gameState = writable({});
+    this.gameState = writable({
+        level: 0,
+        mode: 'none',
+        slide: 0
+    });
     this.players = writable({});
 
     // Derived stores for filtered messages
