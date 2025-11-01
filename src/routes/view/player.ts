@@ -5,6 +5,7 @@ let unit = 100;
 export class Player {
     clientId: string;
     role: string;
+    speed: number;
     pos: vec2;
     vel: vec2;
     scale: vec2;
@@ -13,9 +14,10 @@ export class Player {
     // physics
     collider: AABB;
 
-    constructor(clientId: string, role: string, x = 0, y = 0) {
+    constructor(clientId: string, role: string, x = 0, y = 0, speed = 5) {
         this.clientId = clientId;
         this.role = role;
+        this.speed = speed;
         this.pos = { x: x, y: y };
         this.vel = { x: 0, y: 0 };
         this.scale = { x: 1, y: 1 };
@@ -27,6 +29,13 @@ export class Player {
         if (!ctx) return;
         ctx.fillStyle = '#fc4444ff';
         ctx.fillRect(this.pos.x, this.pos.y, unit, unit);
+    }
+
+    update(deltaTime: number) {
+        if (this.inputs["right"]) this.pos.x += this.speed * deltaTime * unit;
+        if (this.inputs["left"]) this.pos.x -= this.speed * deltaTime * unit;
+        if (this.inputs["up"]) this.pos.y += this.speed * deltaTime * unit;
+        if (this.inputs["down"]) this.pos.y -= this.speed * deltaTime * unit;
     }
 
     calcCollider() {

@@ -24,12 +24,11 @@ export function init(c: HTMLCanvasElement, controller: GameViewController) {
 }
 
 // Update player positions based on inputs
-function update() {
+function update(deltaTime: number) {
   const currentPlayers = get(controllerInstance.players);
 
   Object.values(currentPlayers).forEach(player => {
-    if (player.inputs["right"]) player.pos.x += 1;
-    if (player.inputs["left"]) player.pos.x -= 1;
+    player.update(deltaTime)
   });
 }
 
@@ -44,10 +43,10 @@ function draw() {
 
 // Main loop
 function loop(time: number) {
-  const delta = time - lastTime;
+  const deltaTime = (time - lastTime) * 0.001;
   lastTime = time;
 
-  update();
+  update(deltaTime);
 
   // Clear the screen
   ctx.fillStyle = '#c6c6c6ff';
