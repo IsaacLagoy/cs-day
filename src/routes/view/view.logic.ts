@@ -34,9 +34,12 @@ let slide_10: HTMLImageElement;
 let slide_11: HTMLImageElement;
 let slide_12: HTMLImageElement;
 let slide_13: HTMLImageElement;
+let slide_14: HTMLImageElement;
 let bg_1: HTMLImageElement;
 let bg_2: HTMLImageElement;
 let bg_3: HTMLImageElement;
+let princess_1: HTMLImageElement;
+let princess_2: HTMLImageElement;
 
 let prev_level: Level | null;
 
@@ -91,6 +94,8 @@ if (typeof window !== 'undefined') {
   slide_12.src = '/slide-12.png'; 
   slide_13 = new Image();
   slide_13.src = '/slide-13.png'; 
+  slide_14 = new Image();
+  slide_14.src = '/slide-14.png'; 
 
   bg_1 = new Image();
   bg_1.src = '/bg-1.png'; 
@@ -100,6 +105,11 @@ if (typeof window !== 'undefined') {
   bg_3.src = '/bg-3.png'; 
   QR = new Image();
   QR.src = '/QR.png'; 
+
+  princess_1 = new Image();
+  princess_1.src = '/princess-start.png'; 
+  princess_2 = new Image();
+  princess_2.src = '/princess-end.png'; 
 
   
   level_1 = new Level();
@@ -274,7 +284,10 @@ if (typeof window !== 'undefined') {
       {level: level_9, slide: bg_1, mode: 'platformer'},
       {level: level_10, slide: bg_2, mode: 'platformer'},
       {level: level_11, slide: bg_3, mode: 'platformer'},
+      {level: level_princess_start, slide: princess_1, mode: 'platformer'},
       {level: level_14, slide: null, mode: 'platformer'},
+      {level: level_1, slide: slide_14, mode: 'platformer'},
+      {level: level_princess_end, slide: princess_2, mode: 'platformer'},
       {level: level_13, slide: slide_13, mode: 'platformer'},
     ]
 }
