@@ -21,9 +21,9 @@ export class HostLogic {
         this.buttonConfig = writable([
             { name: 'left', enabled: true },
             { name: 'right', enabled: true },
-            { name: 'jump', enabled: true },
-            { name: 'a', enabled: true },
-            { name: 'b', enabled: true }
+            { name: 'jump', enabled: false },
+            { name: 'a', enabled: false },
+            { name: 'b', enabled: false }
         ]);
   }
 

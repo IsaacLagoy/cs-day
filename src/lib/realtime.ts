@@ -20,6 +20,20 @@ export const messages: Writable<Message[]> = writable([]);
 export const clientId: Writable<string | null> = writable(null);
 export const connectedClients: Writable<ConnectedClient[]> = writable([]);
 
+// Periodically clean up old messages to prevent memory bloat
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    messages.update(msgs => {
+      if (msgs.length > 100) {
+        console.log('[Realtime] Cleaning message store, had', msgs.length, 'messages');
+        // Keep only the last 50 messages
+        return msgs.slice(-50);
+      }
+      return msgs;
+    });
+  }, 30000); // Every 30 seconds
+}
+
 // Single shared Supabase client
 const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
 
@@ -77,6 +91,7 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
         clients.push({ clientId: presence.clientId, role: presence.role });
       }
     }
+    console.log('[Realtime] Connected clients:', clients);
     connectedClients.set(clients);
   });
 
@@ -91,18 +106,25 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
   // ---- Broadcast handling ----
   channel.on('broadcast', { event: 'message' }, (payload: { payload: Message }) => {
     const msg: Message = payload.payload;
+    console.log('[Realtime] Received message:', msg.type, msg);
     messages.update((m) => [...m, msg]);
+    
     if (msg.type === 'buttonConfigRequest' && role === 'host') {
-      console.log('[Realtime] Button config request from', msg.clientId);
+      console.log('[Realtime] ⚠️ Button config request from', msg.clientId, '- Host should respond!');
+    }
+    
+    if (msg.type === 'buttonConfig') {
+      console.log('[Realtime] 🎮 Button config received:', msg);
     }
   });
 
   // ---- Subscribe and track presence ----
   let isSubscribed = false;
   channel.subscribe(async (status: string) => {
+    console.log('[Realtime] Subscription status:', status);
     if (status === 'SUBSCRIBED' && !isSubscribed) {
       isSubscribed = true;
-      console.log(`[Realtime] Connected as ${role}`);
+      console.log(`[Realtime] ✅ Connected as ${role} with ID ${id}`);
       await channel.track({
         clientId: id,
         role,
@@ -144,6 +166,7 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
 
   // ---- Send helpers ----
   function send(gameStateUpdate: Record<string, any>): void {
+    console.log('[Realtime] Sending game update:', gameStateUpdate);
     channel.send({
       type: 'broadcast',
       event: 'message',
@@ -152,6 +175,7 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
   }
 
   function sendInput(button: string, pressed: boolean): void {
+    console.log('[Realtime] Sending input:', button, pressed);
     channel.send({
       type: 'broadcast',
       event: 'message',
@@ -160,6 +184,7 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
   }
 
   function sendButtonConfig(buttons: ButtonConfig[]): void {
+    console.log('[Realtime] 📤 Sending button config:', buttons);
     channel.send({
       type: 'broadcast',
       event: 'message',
@@ -168,6 +193,7 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
   }
 
   function requestButtonConfig(): void {
+    console.log('[Realtime] 📥 Requesting button config from host');
     channel.send({
       type: 'broadcast',
       event: 'message',

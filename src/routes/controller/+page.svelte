@@ -1,101 +1,3 @@
-<div class="container">
-  <h1>Your Color</h1>
-  {#if $clientId}
-    <div class="color-box" style="background-color: {color};">
-
-    </div>
-  {:else}
-    <p>Loading color...</p>
-  {/if}
-
-  <div class="controller-pad">
-    <!-- LEFT SIDE: left & right (D-Pad style, but only left/right exist) -->
-    <div class="button-layout dpad-left" aria-hidden="true">
-      <div></div><div></div><div></div>
-
-      {#if isButtonEnabled('left')}
-        <button
-          class="button arrow-button left {$buttonStates.left ? 'pressed' : ''}"
-          on:mousedown={() => handleButtonDown('left')}
-          on:mouseup={() => handleButtonUp('left')}
-          on:touchstart|preventDefault={() => handleButtonDown('left')}
-          on:touchend|preventDefault={() => handleButtonUp('left')}
-          aria-label="Left"
-        >◀</button>
-      {:else}
-        <div></div>
-      {/if}
-
-      <div></div>
-
-      {#if isButtonEnabled('right')}
-        <button
-          class="button arrow-button right {$buttonStates.right ? 'pressed' : ''}"
-          on:mousedown={() => handleButtonDown('right')}
-          on:mouseup={() => handleButtonUp('right')}
-          on:touchstart|preventDefault={() => handleButtonDown('right')}
-          on:touchend|preventDefault={() => handleButtonUp('right')}
-          aria-label="Right"
-        >▶</button>
-      {:else}
-        <div></div>
-      {/if}
-
-      <div></div><div></div><div></div>
-    </div>
-
-    <!-- RIGHT SIDE: Jump (up) above A & B -->
-    <div class="button-layout actions-right" role="group" aria-label="Action buttons">
-      <div></div>
-      {#if isButtonEnabled('jump')}
-        <button
-          class="button jump {$buttonStates.jump ? 'pressed' : ''}"
-          on:mousedown={() => handleButtonDown('jump')}
-          on:mouseup={() => handleButtonUp('jump')}
-          on:touchstart|preventDefault={() => handleButtonDown('jump')}
-          on:touchend|preventDefault={() => handleButtonUp('jump')}
-          aria-label="Jump"
-        >▲</button>
-      {:else}
-        <div></div>
-      {/if}
-      <div></div>
-
-      {#if isButtonEnabled('b')}
-        <button
-          id="btn-b"
-          class="button {$buttonStates.b ? 'pressed' : ''}"
-          on:mousedown={() => handleButtonDown('b')}
-          on:mouseup={() => handleButtonUp('b')}
-          on:touchstart|preventDefault={() => handleButtonDown('b')}
-          on:touchend|preventDefault={() => handleButtonUp('b')}
-          aria-label="B"
-        >B</button>
-      {:else}
-        <div></div>
-      {/if}
-
-      <div></div>
-
-      {#if isButtonEnabled('a')}
-        <button
-          id="btn-a"
-          class="button {$buttonStates.a ? 'pressed' : ''}"
-          on:mousedown={() => handleButtonDown('a')}
-          on:mouseup={() => handleButtonUp('a')}
-          on:touchstart|preventDefault={() => handleButtonDown('a')}
-          on:touchend|preventDefault={() => handleButtonUp('a')}
-          aria-label="A"
-        >A</button>
-      {:else}
-        <div></div>
-      {/if}
-
-      <div></div><div></div><div></div>
-    </div>
-  </div>
-</div>
-
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { clientId } from '$lib/realtime';
@@ -122,14 +24,120 @@
     controller.handleButtonUp(button);
   }
 
-  function isButtonEnabled(buttonName: string): boolean {
-    const button = $buttonConfig.find(b => b.name === buttonName);
-    return button ? button.enabled : false;
+  // Create a reactive map of button enabled states
+  // This is more efficient than calling a function in the template
+  $: buttonEnabled = {
+    left: $buttonConfig.find(b => b.name === 'left')?.enabled ?? false,
+    right: $buttonConfig.find(b => b.name === 'right')?.enabled ?? false,
+    jump: $buttonConfig.find(b => b.name === 'jump')?.enabled ?? false,
+    a: $buttonConfig.find(b => b.name === 'a')?.enabled ?? false,
+    b: $buttonConfig.find(b => b.name === 'b')?.enabled ?? false
+  };
+
+  // Log when button config changes for debugging
+  $: {
+    console.log('[Controller Page] Button config updated:', $buttonConfig);
+    console.log('[Controller Page] Button enabled states:', buttonEnabled);
   }
 
-  // reactive color variable (without $ prefix)
+  // reactive color variable
   $: color = $clientId ? '#' + $clientId.slice(0, 6) : '#000000';
 </script>
+
+<div class="container">
+  <h1>Your Color</h1>
+  {#if $clientId}
+    <div class="color-box" style="background-color: {color};">
+    </div>
+  {:else}
+    <p>Loading color...</p>
+  {/if}
+
+  <div class="controller-pad">
+    <!-- LEFT SIDE: left & right (D-Pad style, but only left/right exist) -->
+    <div class="button-layout dpad-left" aria-hidden="true">
+      <div></div><div></div><div></div>
+
+      {#if buttonEnabled.left}
+        <button
+          class="button arrow-button left {$buttonStates.left ? 'pressed' : ''}"
+          on:mousedown={() => handleButtonDown('left')}
+          on:mouseup={() => handleButtonUp('left')}
+          on:touchstart|preventDefault={() => handleButtonDown('left')}
+          on:touchend|preventDefault={() => handleButtonUp('left')}
+          aria-label="Left"
+        >◀</button>
+      {:else}
+        <div></div>
+      {/if}
+
+      <div></div>
+
+      {#if buttonEnabled.right}
+        <button
+          class="button arrow-button right {$buttonStates.right ? 'pressed' : ''}"
+          on:mousedown={() => handleButtonDown('right')}
+          on:mouseup={() => handleButtonUp('right')}
+          on:touchstart|preventDefault={() => handleButtonDown('right')}
+          on:touchend|preventDefault={() => handleButtonUp('right')}
+          aria-label="Right"
+        >▶</button>
+      {:else}
+        <div></div>
+      {/if}
+
+      <div></div><div></div><div></div>
+    </div>
+
+    <!-- RIGHT SIDE: Jump (up) above A & B -->
+    <div class="button-layout actions-right" role="group" aria-label="Action buttons">
+      <div></div><div></div><div></div>
+
+      {#if buttonEnabled.b}
+        <button
+          id="btn-b"
+          class="button {$buttonStates.b ? 'pressed' : ''}"
+          on:mousedown={() => handleButtonDown('b')}
+          on:mouseup={() => handleButtonUp('b')}
+          on:touchstart|preventDefault={() => handleButtonDown('b')}
+          on:touchend|preventDefault={() => handleButtonUp('b')}
+          aria-label="B"
+        >B</button>
+      {:else}
+        <div></div>
+      {/if}
+
+      {#if buttonEnabled.jump}
+        <button
+          class="button jump {$buttonStates.jump ? 'pressed' : ''}"
+          on:mousedown={() => handleButtonDown('jump')}
+          on:mouseup={() => handleButtonUp('jump')}
+          on:touchstart|preventDefault={() => handleButtonDown('jump')}
+          on:touchend|preventDefault={() => handleButtonUp('jump')}
+          aria-label="Jump"
+        >▲</button>
+      {:else}
+        <div></div>
+      {/if}
+
+      {#if buttonEnabled.a}
+        <button
+          id="btn-a"
+          class="button {$buttonStates.a ? 'pressed' : ''}"
+          on:mousedown={() => handleButtonDown('a')}
+          on:mouseup={() => handleButtonUp('a')}
+          on:touchstart|preventDefault={() => handleButtonDown('a')}
+          on:touchend|preventDefault={() => handleButtonUp('a')}
+          aria-label="A"
+        >A</button>
+      {:else}
+        <div></div>
+      {/if}
+      
+      <div></div><div></div><div></div>
+    </div>
+  </div>
+</div>
 
 <style>
   .color-box {
@@ -152,6 +160,10 @@
     padding: 0;
     height: 100%;
     user-select: none;
+  }
+
+  .ctrl-hidden {
+    background-color: red;
   }
 
   .container {
@@ -214,7 +226,7 @@
     }
   }
 
-  /* Buttons — follow the original svelte color palette / feel */
+  /* Buttons – follow the original svelte color palette / feel */
   .button {
     width: 84px;
     height: 84px;
@@ -248,7 +260,7 @@
   .jump { border-radius: 12px; font-size: 18px; }
 
   /* Action-specific IDs kept for potential future color tweaks */
-  #btn-a { /* keep neutral — acts like original control button */ }
+  #btn-a { /* keep neutral – acts like original control button */ }
   #btn-b { }
 
   /* Arrow-specific style (left/right) */
