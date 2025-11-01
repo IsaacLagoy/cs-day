@@ -31,6 +31,16 @@ export class Player extends GameObject {
             this.canJump = false;
         }
 
+        // death planes
+        if (this.position.y < -10) {
+            this.respawn();
+        }
+
         super.update(deltaTime);
+    }
+
+    respawn() {
+        this.position = { x: -7.5, y: 0 };
+        this.vel = { x: 0, y: 0};
     }
 }
