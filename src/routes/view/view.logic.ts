@@ -120,13 +120,16 @@ function update(deltaTime: number) {
     level_list[level].update();
 
     // collision
+    player.canJump = false;
     Object.values(level_list[level]?.objects).forEach(obj => {
         if (collide(player.collider, obj.collider)) {
             const mtv = getMTV(player.collider, obj.collider, player.vel);
             player.position.x += mtv.x;
             player.position.y += mtv.y;
-            player.vel.y = 0;
-            player.canJump = true;
+
+            if (mtv.x === 0) {
+                player.canJump = true;
+            }
         }
     });
   });
