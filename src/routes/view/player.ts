@@ -5,8 +5,9 @@ let unit = 100;
 export class Player {
     clientId: string;
     role: string;
-    speed: number;
     pos: vec2;
+    color: string;
+    speed: number;
     vel: vec2;
     scale: vec2;
     inputs: Record<string, boolean>;
@@ -14,11 +15,12 @@ export class Player {
     // physics
     collider: AABB;
 
-    constructor(clientId: string, role: string, x = 0, y = 0, speed = 5) {
+    constructor(clientId: string, role: string, x = 0, y = 0, color='#fc4444ff', speed = 5) {
         this.clientId = clientId;
         this.role = role;
-        this.speed = speed;
         this.pos = { x: x, y: y };
+        this.color = color;
+        this.speed = speed;
         this.vel = { x: 0, y: 0 };
         this.scale = { x: 1, y: 1 };
         this.collider = { topRight: this.pos, bottomLeft: this.pos }; // temporary value
@@ -27,7 +29,7 @@ export class Player {
 
     draw(ctx: CanvasRenderingContext2D) {
         if (!ctx) return;
-        ctx.fillStyle = '#fc4444ff';
+        ctx.fillStyle = this.color;
         ctx.fillRect(this.pos.x, this.pos.y, unit, unit);
     }
 
