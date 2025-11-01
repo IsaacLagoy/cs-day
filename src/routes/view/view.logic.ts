@@ -199,6 +199,9 @@ function draw() {
   let level = gameState.level;
 
   if (slide_list[slide]) drawBackground(slide_list[slide]);
+
+  if (gameState.mode === 'none') return;
+
   if (level_list[level]) level_list[level].draw(ctx, canvas.width, canvas.height);
 
   const currentPlayers = get(controllerInstance.players);
