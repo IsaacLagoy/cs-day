@@ -7,7 +7,14 @@ let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 let controllerInstance: GameViewController;
 let lastTime = 0;
+let slide_1: HTMLImageElement;
 
+
+// Load assets
+if (typeof window !== 'undefined') {
+  slide_1 = new Image();
+  slide_1.src = '/src/lib/assets/slide-1.png'; 
+}
 
 // Initialize the canvas and start the game loop
 export function init(c: HTMLCanvasElement, controller: GameViewController) {
@@ -20,8 +27,18 @@ export function init(c: HTMLCanvasElement, controller: GameViewController) {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
+  function resizeCanvas() {
+    if (!canvas) return;
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+
   requestAnimationFrame(loop);
 }
+
+
 
 // Update player positions based on inputs
 function update(deltaTime: number) {
@@ -41,6 +58,33 @@ function draw() {
   });
 }
 
+function drawBackground() {
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+
+  const imageAspect = 2560 / 1440;
+  const canvasAspect = canvasWidth / canvasHeight;
+
+  let drawWidth, drawHeight, offsetX, offsetY;
+
+  if (canvasAspect > imageAspect) {
+    // Canvas is wider than image → height matches, width scaled
+    drawHeight = canvasHeight;
+    drawWidth = canvasHeight * imageAspect;
+    offsetX = (canvasWidth - drawWidth) / 2;
+    offsetY = 0;
+  } else {
+    // Canvas is taller → width matches, height scaled
+    drawWidth = canvasWidth;
+    drawHeight = canvasWidth / imageAspect;
+    offsetX = 0;
+    offsetY = (canvasHeight - drawHeight) / 2;
+  }
+
+  ctx.drawImage(slide_1, offsetX, offsetY, drawWidth, drawHeight);
+}
+
+
 // Main loop
 function loop(time: number) {
   const deltaTime = (time - lastTime) * 0.001;
@@ -49,10 +93,13 @@ function loop(time: number) {
   update(deltaTime);
 
   // Clear the screen
-  ctx.fillStyle = '#c6c6c6ff';
+  ctx.fillStyle = '#111';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  drawBackground();
+  
   draw();
+
 
   requestAnimationFrame(loop);
 }
