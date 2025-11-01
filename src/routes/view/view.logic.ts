@@ -318,16 +318,14 @@ export function init(c: HTMLCanvasElement, controller: GameViewController) {
 // Update player positions based on inputs
 function update(deltaTime: number) {
   const currentPlayers = get(controllerInstance.players);
-
   const gameState = get(controllerInstance.gameState);
   let scene = gameState.scene;
+
   const levelChange = prev_level !== scene_list[scene].level && scene_list[scene].level !== level_1;
   prev_level = scene_list[scene].level;
 
-  if (scene_list[scene].level === null) return;
-
   // reset coins
-  if (levelChange) {
+  if (levelChange && scene_list[scene].level) {
     Object.values(scene_list[scene].level?.objects).forEach(obj => {
       if (obj instanceof Coin) {
         obj.do_draw = true;
@@ -337,8 +335,7 @@ function update(deltaTime: number) {
 
   const do_gravity = (scene_list[scene].mode === "platformer");
 
-  if (scene_list[scene].level === null) return;
-  scene_list[scene].level.update(deltaTime);
+  if (scene_list[scene].level) scene_list[scene].level.update(deltaTime);
 
   Object.values(currentPlayers).forEach(player => {
     player.update(deltaTime, do_gravity);
