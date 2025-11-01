@@ -99,13 +99,16 @@ if (typeof window !== 'undefined') {
   level_2.add(level_2_floor);
   level_2.add(level_2_goal);
   
+  
   level_3 = new Level();
   let level_3_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
   let level_3_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
   let level_3_goal = new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff");
+  let level_3_coin = new Coin({x: 0, y: 0});
   level_3.add(level_3_floor_left);
   level_3.add(level_3_floor_right);
   level_3.add(level_3_goal);
+  level_3.add(level_3_coin);
   
   level_4 = new Level();
   let level_4_floor_left = new GameObject({x: -7, y: -5}, {x: 6, y: 2}, "#dfdfdfff");
@@ -231,6 +234,17 @@ function update(deltaTime: number) {
   const levelChange = prev_level !== scene_list[scene].level && scene_list[scene].level !== level_1;
   prev_level = scene_list[scene].level;
 
+  if (scene_list[scene].level === null) return;
+
+  // reset coins
+  if (levelChange) {
+    Object.values(scene_list[scene].level?.objects).forEach(obj => {
+      if (obj instanceof Coin) {
+        obj.do_draw = true;
+      }
+    })
+  }
+
   const do_gravity = (scene_list[scene].mode === "platformer");
 
   if (scene_list[scene].level === null) return;
@@ -249,12 +263,17 @@ function update(deltaTime: number) {
     player.canJump = false;
     Object.values(scene_list[scene].level?.objects).forEach(obj => {
         if (collide(player.collider, obj.collider)) {
-            const mtv = getMTV(player.collider, obj.collider, player.vel);
-            player.position.x += mtv.x;
-            player.position.y += mtv.y;
+            if (obj instanceof Coin) {
+              obj.do_draw = false;
+              // play sound?
+            } else {
+              const mtv = getMTV(player.collider, obj.collider, player.vel);
+              player.position.x += mtv.x;
+              player.position.y += mtv.y;
 
-            if (mtv.x === 0) {
-                player.canJump = true;
+              if (mtv.x === 0) {
+                  player.canJump = true;
+              }
             }
         }
     });
