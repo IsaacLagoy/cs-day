@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
   import { connectedClients, clientId } from '$lib/realtime';
-  import { GameViewController } from './view.logic';
+  import { GameViewController } from './controller';
   import { init } from './view.logic';
 
   const controller = new GameViewController();

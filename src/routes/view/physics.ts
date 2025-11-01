@@ -11,4 +11,3 @@ export function collide(a: AABB, b: AABB): boolean {
     
     return true;
 }
-
