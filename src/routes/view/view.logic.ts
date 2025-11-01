@@ -51,6 +51,7 @@ let level_8: Level;
 let level_9: Level;
 let level_10: Level;
 let level_11: Level;
+let level_12: Level;
 
 let scene_list: Scene[];
 
@@ -177,6 +178,16 @@ if (typeof window !== 'undefined') {
   level_11.add(level_11_mid);
   level_11.add(level_11_left);
   level_11.add(level_11_right);
+
+  level_12 = new Level();
+  let level_12_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
+  let level_12_mid = new GameObject({x: 0, y: 1}, {x: 3, y: 0.5}, "#dfdfdfff");
+  let level_12_left = new GameObject({x: -6, y: -2}, {x: 3, y: 0.5}, "#dfdfdfff");
+  let level_12_right = new GameObject({x: 6, y: -2}, {x: 3, y: 0.5}, "#dfdfdfff");
+  level_12.add(level_12_floor);
+  level_12.add(level_12_mid);
+  level_12.add(level_12_left);
+  level_12.add(level_12_right);
   
   // define scenes
   scene_list = [
@@ -196,6 +207,7 @@ if (typeof window !== 'undefined') {
         {level: level_8, slide: slide_9, mode: 'platformer'},
         {level: level_6, slide: slide_10, mode: 'platformer'},
         {level: level_7, slide: slide_11, mode: 'platformer'},
+        {level: level_12, slide: null, mode: 'platformer'},
         {level: level_9, slide: bg_1, mode: 'platformer'},
         {level: level_10, slide: bg_2, mode: 'platformer'},
         {level: level_11, slide: bg_3, mode: 'platformer'},
