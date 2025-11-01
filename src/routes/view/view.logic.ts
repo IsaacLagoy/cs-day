@@ -237,22 +237,22 @@ if (typeof window !== 'undefined') {
 
   // engine slide
   level_15 = new Level();
-  level_15.add(new GameObject({x: -8.5, y: -6}, {x: 4, y: 2}, "#926b45ff"));
-  level_15.add(new GameObject({x: -2, y: -6}, {x: 2, y: 4}, "#926b45ff"));
-  level_15.add(new GameObject({x: 3, y: -7}, {x: 2, y: 4}, "#926b45ff"));  
-  level_15.add(new GameObject({x: 8.5, y: -5}, {x: 4, y: 6}, "#926b45ff"));
-  level_15.add(new GameObject({x: 1.5, y: 0.5}, {x: 4, y: 0.5}, "#926b45ff"));
-  level_15.add(new GameObject({x: 8.5, y: 3}, {x: 4, y: 1}, "#72e56cff"));
+  level_15.add(new GameObject({x: -8.5, y: -6}, {x: 4, y: 2}, "#dfdfdfff"));
+  level_15.add(new GameObject({x: -2, y: -6}, {x: 2, y: 4}, "#dfdfdfff"));
+  level_15.add(new GameObject({x: 3, y: -7}, {x: 2, y: 4}, "#dfdfdfff"));  
+  level_15.add(new GameObject({x: 8.5, y: -5}, {x: 4, y: 6}, "#dfdfdfff"));
+  level_15.add(new GameObject({x: 1.5, y: 0.5}, {x: 4, y: 0.5}, "#dfdfdfff"));
+  level_15.add(new GameObject({x: 8.5, y: 3}, {x: 4, y: 1}, "#dfdfdfff"));
 
   // Narative Levels
   level_14 = new Level();
-  let level_14_start = new GameObject({x: -8.5, y: -3}, {x: 3, y: 10}, "#dfdfdfff");
-  let level_14_platform_1 = new MovingPlatform({x: -6, y: -5.5}, {x: -6, y: 1.75}, 5, {x: 2, y: 0.5}, "#dfdfdfff");
-  let level_14_floor = new GameObject({x: -5, y: -6}, {x: 6, y: 2}, "#dfdfdfff");
-  let level_14_wall = new GameObject({x: -4, y: 3}, {x: 2, y: 10}, "#dfdfdfff");
-  let level_14_platform_2 = new MovingPlatform({x: 1, y: -5}, {x: 1, y: -1}, 4, {x: 2, y: 0.5}, "#dfdfdfff");
-  let level_14_platform_3 = new MovingPlatform({x: 4, y: -1}, {x: 4, y: 1.75}, 2, {x: 2, y: 0.5}, "#dfdfdfff");
-  let level_14_end = new GameObject({x: 8.5, y: -2}, {x: 3, y: 10}, "#dfdfdfff");
+  let level_14_start = new GameObject({x: -8.5, y: -3}, {x: 3, y: 10}, "#3eac3eff");
+  let level_14_platform_1 = new MovingPlatform({x: -6, y: -5.5}, {x: -6, y: 1.75}, 5, {x: 2, y: 0.5}, "#926b45ff");
+  let level_14_floor = new GameObject({x: -5, y: -6}, {x: 6, y: 2}, "#3eac3eff");
+  let level_14_wall = new GameObject({x: -4, y: 3}, {x: 2, y: 10}, "#3eac3eff");
+  let level_14_platform_2 = new MovingPlatform({x: 1, y: -5}, {x: 1, y: -1}, 4, {x: 2, y: 0.5}, "#926b45ff");
+  let level_14_platform_3 = new MovingPlatform({x: 4, y: -1}, {x: 4, y: 1.75}, 2, {x: 2, y: 0.5}, "#926b45ff");
+  let level_14_end = new GameObject({x: 8.5, y: -2}, {x: 3, y: 10}, "#72e56cff");
   level_14.add(level_14_start);
   level_14.add(level_14_platform_1);
   level_14.add(level_14_platform_2);
@@ -285,8 +285,8 @@ if (typeof window !== 'undefined') {
       {level: level_10, slide: bg_2, mode: 'platformer'},
       {level: level_11, slide: bg_3, mode: 'platformer'},
       {level: level_princess_start, slide: princess_1, mode: 'platformer'},
-      {level: level_14, slide: null, mode: 'platformer'},
-      {level: level_1, slide: slide_14, mode: 'platformer'},
+      {level: level_14, slide: bg_3, mode: 'platformer'},
+      {level: level_15, slide: slide_14, mode: 'platformer'},
       {level: level_princess_end, slide: princess_2, mode: 'platformer'},
       {level: level_13, slide: slide_13, mode: 'platformer'},
     ]
