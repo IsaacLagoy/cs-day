@@ -53,11 +53,16 @@ export function init(c: HTMLCanvasElement, controller: GameViewController) {
 
 
 // Update player positions based on inputs
-function update(deltaTime: number) {
+function update(deltaTime: number, level: Level) {
   const currentPlayers = get(controllerInstance.players);
 
   Object.values(currentPlayers).forEach(player => {
     player.update(deltaTime)
+
+    // collision
+    Object.values(level.objects).forEach(obj => {
+
+    });
   });
 }
 
@@ -108,7 +113,7 @@ function loop(time: number) {
   let slide = gameState.slide;
   lastTime = time;
 
-  update(deltaTime);
+  update(deltaTime, level);
 
   // Clear the screen
   ctx.fillStyle = '#111';
