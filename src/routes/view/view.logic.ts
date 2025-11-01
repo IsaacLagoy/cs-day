@@ -16,6 +16,11 @@ let slide_list: Array<HTMLImageElement | null>;
 let slide_1: HTMLImageElement;
 let slide_2: HTMLImageElement;
 let slide_3: HTMLImageElement;
+let slide_4: HTMLImageElement;
+let slide_5: HTMLImageElement;
+let slide_6: HTMLImageElement;
+let slide_7: HTMLImageElement;
+
 
 let level_list: Array<Level | null>;
 let level_1: Level;
@@ -29,8 +34,16 @@ if (typeof window !== 'undefined') {
   slide_2.src = '/slide-2.png'; 
   slide_3 = new Image();
   slide_3.src = '/slide-3.png'; 
+  slide_4 = new Image();
+  slide_4.src = '/slide-4.png'; 
+  slide_5 = new Image();
+  slide_5.src = '/slide-5.png'; 
+  slide_6 = new Image();
+  slide_6.src = '/slide-6.png'; 
+  slide_7 = new Image();
+  slide_7.src = '/slide-7.png'; 
 
-  slide_list = [slide_1, slide_2, slide_3, null];
+  slide_list = [slide_1, slide_2, slide_3, slide_4, slide_5, slide_6, slide_7, null];
 
 
   level_1 = new Level();
@@ -38,8 +51,8 @@ if (typeof window !== 'undefined') {
   level_1.add(level_1_floor);
 
   level_2 = new Level();
-  let level_2_floor_left = new GameObject({x: -5, y: -5}, {x: 3, y: 2}, "#dfdfdfff");
-  let level_2_floor_right = new GameObject({x: 5, y: -5}, {x: 3, y: 2}, "#dfdfdfff");
+  let level_2_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
+  let level_2_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
   level_2.add(level_2_floor_left);
   level_2.add(level_2_floor_right);
 

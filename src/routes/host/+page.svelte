@@ -15,9 +15,11 @@
 
     function setMode(mode: string): void { host.setMode(mode); }
 
+    function resetLevel(): void { host.resetLevel(); }
     function incLevel(): void { host.incLevel(); }
     function decLevel(): void { host.decLevel(); }
 
+    function resetSlide(): void { host.resetSlide(); }
     function incSlide(): void { host.incSlide(); }
     function decSlide(): void { host.decSlide(); }
 
@@ -35,12 +37,14 @@
 <hr>
 <h3>Slide</h3>
 
+<button on:click={() => resetSlide()}>Reset</button>
 <button on:click={() => decSlide()}>Slide Backward</button>
 <button on:click={() => incSlide()}>Slide Forward</button>
 
 <hr>
 <h3>Level</h3>
 
+<button on:click={() => resetLevel()}>Reset</button>
 <button on:click={() => decLevel()}>Level Backward</button>
 <button on:click={() => incLevel()}>Level Forward</button>
 
