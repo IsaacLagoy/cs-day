@@ -2,7 +2,8 @@
 import { derived, writable, get } from 'svelte/store';
 import type { Writable, Readable } from 'svelte/store';
 import { connect, messages, connectedClients } from '$lib/realtime';
-import type { WebSocketConnection, GameUpdateMessage, PlayerInputMessage, ConnectedClient } from '$lib/realtime';
+import type { WebSocketConnection } from '$lib/realtime';
+import type { GameUpdateMessage, PlayerInputMessage, ConnectedClient } from '$lib/types'
 
 // Game Rendering
 let canvas: HTMLCanvasElement;
