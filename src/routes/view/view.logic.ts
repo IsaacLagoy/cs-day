@@ -5,6 +5,7 @@ import { Level } from './level';
 import { GameObject } from './game_object';
 import { collide, getMTV } from './physics';
 import { MovingPlatform } from './moving_platform';
+import { Coin } from './coin';
 
 interface Scene {
     level: Level | null;
