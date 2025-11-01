@@ -32,8 +32,17 @@ export class Player extends GameObject {
         }
 
         // death planes
-        if (this.position.y < -10) {
+        if (this.position.y < -10 || this.position.y > 20) {
             this.respawn();
+        }
+
+        // bounding wall
+        if (this.position.x < -10) {
+            this.position.x = -10;
+        }
+
+        if (this.position.x > 10) {
+            this.position.x = 10;
         }
 
         super.update(deltaTime);
