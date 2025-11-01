@@ -12,15 +12,31 @@
         host.destroy();
     });
 
-    function startGame() {
-        host.startGame();
-    }
+    function setMode(mode: string): void { host.setMode(mode); }
 
-    function setFlag(name: string, value: boolean) {
-        host.setFlag(name, value);
-    }
+    function incLevel(): void { host.incLevel(); }
+    function decLevel(): void { host.decLevel(); }
+
+    function incSlide(): void { host.incSlide(); }
+    function decSlide(): void { host.decSlide(); }
 </script>
 
 <h1>Host Controls</h1>
-<button on:click={startGame}>Start Game</button>
-<button on:click={() => setFlag('hardMode', true)}>Enable Hard Mode</button>
+
+<h2>Game Settings</h2>
+
+<button on:click={() => setMode('none')}>Set Mode None</button>
+<button on:click={() => setMode('fly')}>Set Mode Fly</button>
+<button on:click={() => setMode('platformer')}>Set Mode Platformer</button>
+
+<hr>
+
+<button on:click={() => incSlide()}>Slide Forward</button>
+<button on:click={() => decSlide()}>Slide Backward</button>
+
+<hr>
+
+<button on:click={() => incLevel()}>Level Forward</button>
+<button on:click={() => decLevel()}>Level Backward</button>
+
+<h2>Player Settings</h2>
