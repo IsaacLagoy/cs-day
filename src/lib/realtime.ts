@@ -1,3 +1,4 @@
+// src/lib/realtime.ts
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { createClient } from '@supabase/supabase-js';
@@ -25,15 +26,25 @@ export interface ClientLeftMessage extends BaseMessage {
   type: 'clientLeft';
 }
 
+export interface PlayerInputMessage extends BaseMessage {
+  type: 'playerInput';
+  role: string;
+  input: {
+    button: string;
+    pressed: boolean;
+  };
+}
+
 export interface GameUpdateMessage extends BaseMessage {
   type: 'gameUpdate';
   gameState: Record<string, any>;
 }
 
-export type Message = ClientJoinedMessage | ClientLeftMessage | GameUpdateMessage;
+export type Message = ClientJoinedMessage | ClientLeftMessage | GameUpdateMessage | PlayerInputMessage;
 
 export interface WebSocketConnection {
   send: (gameStateUpdate: Record<string, any>) => void;
+  sendInput: (button: string, pressed: boolean) => void;
   clientId: string;
 }
 
@@ -119,5 +130,18 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
     });
   }
 
-  return { send, clientId: id };
+  function sendInput(button: string, pressed: boolean): void {
+    channel.send({
+      type: 'broadcast',
+      event: 'message',
+      payload: { 
+        type: 'playerInput', 
+        clientId: id, 
+        role,
+        input: { button, pressed }
+      }
+    });
+  }
+
+  return { send, sendInput, clientId: id };
 }
