@@ -225,6 +225,14 @@ if (typeof window !== 'undefined') {
   level_princess_end.add(new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#926b45ff"));
   level_princess_end.add(new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff"));
 
+  // engine slide
+  level_15 = new Level();
+  level_15.add(new GameObject({x: -8.5, y: -6}, {x: 4, y: 2}, "#926b45ff"));
+  level_15.add(new GameObject({x: -2, y: -6}, {x: 2, y: 4}, "#926b45ff"));
+  level_15.add(new GameObject({x: 3, y: -7}, {x: 2, y: 4}, "#926b45ff"));  
+  level_15.add(new GameObject({x: 8.5, y: -5}, {x: 4, y: 6}, "#926b45ff"));
+  level_15.add(new GameObject({x: 1.5, y: 0.5}, {x: 4, y: 0.5}, "#926b45ff"));
+  level_15.add(new GameObject({x: 8.5, y: 3}, {x: 4, y: 1}, "#72e56cff"));
 
   // Narative Levels
   level_14 = new Level();
