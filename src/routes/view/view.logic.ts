@@ -97,7 +97,7 @@ function drawBackground(image: HTMLImageElement) {
 }
 
 const level = new Level();
-const object = new GameObject({x: 1, y: 1});
+const object = new GameObject({x: 0, y: 2});
 level.add(object);
 
 // Main loop
