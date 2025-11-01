@@ -55,6 +55,8 @@ let level_10: Level;
 let level_11: Level;
 let level_12: Level;
 let level_13: Level;
+let level_princess_start: Level;
+let level_princess_end: Level;
 let level_14: Level;
 let level_15: Level;
 let level_16: Level;
@@ -214,6 +216,14 @@ if (typeof window !== 'undefined') {
   level_13.add(level_13_floor_left);
   level_13.add(level_13_floor_right);
   level_13.add(level_13_coin);
+
+  level_princess_start = new Level();
+  level_princess_start.add(new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#926b45ff"));
+  level_princess_start.add(new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff"));
+
+  level_princess_end = new Level();
+  level_princess_end.add(new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#926b45ff"));
+  level_princess_end.add(new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff"));
 
 
   // Narative Levels
