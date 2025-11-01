@@ -105,6 +105,7 @@ function update(deltaTime: number, level: Level) {
             player.position.x += mtv.x;
             player.position.y += mtv.y;
             player.vel.y = 0;
+            player.canJump = true;
         }
     });
   });
