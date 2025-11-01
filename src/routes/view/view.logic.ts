@@ -84,28 +84,17 @@ if (typeof window !== 'undefined') {
   QR = new Image();
   QR.src = '/QR.png'; 
 
-  // SLIDE 10
-  // test_level = new Level();
-  // let test_level_left = new GameObject({x: -5.95, y: -1.45}, {x: 5.35, y: 4.3}, "#941a1a", false);
-  // let test_level_right = new GameObject({x: 4.35, y: -1.1}, {x: 10.9, y: 8.65}, "#941a1a", false);
-  // test_level.add(test_level_left);
-  // test_level.add(test_level_right);
-
-  // // SLIDE 11
-  // test_level = new Level();
-  // let test_level_floor = new GameObject({x: 0, y: 0.25}, {x: 17, y: 0.5}, "#ffffffff");
-  // test_level.add(test_level_floor);
-
+  
   level_1 = new Level();
   let level_1_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
   level_1.add(level_1_floor);
-
+  
   level_2 = new Level();
   let level_2_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
   let level_2_goal = new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff");
   level_2.add(level_2_floor);
   level_2.add(level_2_goal);
-
+  
   level_3 = new Level();
   let level_3_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
   let level_3_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
@@ -113,7 +102,7 @@ if (typeof window !== 'undefined') {
   level_3.add(level_3_floor_left);
   level_3.add(level_3_floor_right);
   level_3.add(level_3_goal);
-
+  
   level_4 = new Level();
   let level_4_floor_left = new GameObject({x: -7, y: -5}, {x: 6, y: 2}, "#dfdfdfff");
   let level_4_floor_mid = new GameObject({x: 0, y: -4}, {x: 2, y: 4}, "#dfdfdfff");
@@ -121,7 +110,7 @@ if (typeof window !== 'undefined') {
   level_4.add(level_4_floor_left);
   level_4.add(level_4_floor_mid);
   level_4.add(level_4_floor_right);
-
+  
   level_5 = new Level();
   let level_5_floor_left = new GameObject({x: -7, y: -5}, {x: 6, y: 2}, "#dfdfdfff");
   let level_5_platform = new MovingPlatform({x: 0, y: -4.25}, {x: 0, y: -.25}, 5, {x: 2, y: 0.5}, "#dfdfdfff");
@@ -129,7 +118,26 @@ if (typeof window !== 'undefined') {
   level_5.add(level_5_floor_left);
   level_5.add(level_5_floor_right);
   level_5.add(level_5_platform);
+  
+  // SLIDE 9
+  level_8 = new Level();
+  let level_8_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
+  level_8.add(level_8_floor);
 
+  // SLIDE 10
+  level_6 = new Level();
+  let level_6_left = new GameObject({x: -5.95, y: -1.45}, {x: 5.35, y: 4.3}, "#941a1a", false);
+  let level_6_right = new GameObject({x: 4.35, y: -1.1}, {x: 10.9, y: 8.65}, "#941a1a", false);
+  level_6.add(level_6_left);
+  level_6.add(level_6_right);
+
+  // SLIDE 11
+  level_7 = new Level();
+  let level_7_floor = new GameObject({x: 0, y: 0.25}, {x: 17, y: 0.5}, "#c8c8c8ff");
+  level_7.add(level_7_floor);
+
+  
+  
   // define scenes
   scene_list = [
         {level: null, slide: slide_1, mode: 'none'},
@@ -145,6 +153,9 @@ if (typeof window !== 'undefined') {
         {level: level_3, slide: null, mode: 'platformer'},
         {level: level_4, slide: null, mode: 'platformer'},
         {level: level_5, slide: null, mode: 'platformer'},
+        {level: level_8, slide: slide_9, mode: 'platformer'},
+        {level: level_6, slide: slide_10, mode: 'platformer'},
+        {level: level_7, slide: slide_11, mode: 'platformer'},
     ]
 }
 
@@ -188,9 +199,7 @@ function update(deltaTime: number) {
     const gameState = get(controllerInstance.gameState);
     let scene = gameState.scene;
 
-    if (scene_list[scene].level == null) {
-        return;
-    }
+    if (scene_list[scene].level === null) return;
 
     if (levelChange) {
         player.respawn();
