@@ -1,11 +1,12 @@
-import type { GameUpdateMessage, PlayerInputMessage, ConnectedClient, vec2, AABB } from '$lib/types'
+import type { vec2, AABB } from '$lib/types'
+import { GameObject } from './game_object'
 
 let unit = 100;
 
-export class Player {
+export class Player extends GameObject {
     clientId: string;
     role: string;
-    pos: vec2;
+    position: vec2;
     color: string;
     speed: number;
     vel: vec2;
@@ -15,35 +16,36 @@ export class Player {
     // physics
     collider: AABB;
 
-    constructor(clientId: string, role: string, x = 0, y = 0, color='#fc4444ff', speed = 5) {
+    constructor(clientId: string, role: string, position: vec2 = {x: 0, y: 0}, color='#fc4444ff', speed = 5) {
+        super(position, {x: 1, y: 1}, color);
         this.clientId = clientId;
         this.role = role;
-        this.pos = { x: x, y: y };
+        this.position = position;
         this.color = color;
         this.speed = speed;
         this.vel = { x: 0, y: 0 };
         this.scale = { x: 1, y: 1 };
-        this.collider = { topRight: this.pos, bottomLeft: this.pos }; // temporary value
+        this.collider = { topRight: this.position, bottomLeft: this.position }; // temporary value
         this.inputs = {};
     }
 
     draw(ctx: CanvasRenderingContext2D) {
         if (!ctx) return;
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.pos.x * unit, this.pos.y * unit, unit, unit);
+        ctx.fillRect(this.position.x * unit, this.position.y * unit, unit, unit);
     }
 
     update(deltaTime: number) {
-        if (this.inputs["right"]) this.pos.x += this.speed * deltaTime;
-        if (this.inputs["left"]) this.pos.x -= this.speed * deltaTime;
-        if (this.inputs["up"]) this.pos.y += this.speed * deltaTime;
-        if (this.inputs["down"]) this.pos.y -= this.speed * deltaTime;
+        if (this.inputs["right"]) this.position.x += this.speed * deltaTime;
+        if (this.inputs["left"]) this.position.x -= this.speed * deltaTime;
+        if (this.inputs["up"]) this.position.y += this.speed * deltaTime;
+        if (this.inputs["down"]) this.position.y -= this.speed * deltaTime;
     }
 
     calcCollider() {
-        this.collider.topRight.x = this.pos.x * this.scale.x;
-        this.collider.topRight.y = this.pos.y * this.scale.y;
-        this.collider.bottomLeft.x = -this.pos.x * this.scale.x;
-        this.collider.bottomLeft.y = -this.pos.y * this.scale.y;
+        this.collider.topRight.x = this.position.x * this.scale.x;
+        this.collider.topRight.y = this.position.y * this.scale.y;
+        this.collider.bottomLeft.x = -this.position.x * this.scale.x;
+        this.collider.bottomLeft.y = -this.position.y * this.scale.y;
     }
 }

@@ -1,6 +1,9 @@
 // src/routes/view/view.logic.ts
 import { get } from 'svelte/store';
 import { GameViewController } from './controller';
+import { Level } from './level';
+import { GameObject } from './game_object';
+
 
 // Game Rendering
 let canvas: HTMLCanvasElement;
@@ -93,6 +96,9 @@ function drawBackground(image: HTMLImageElement) {
   ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
 }
 
+const level = new Level();
+const object = new GameObject({x: 1, y: 1});
+level.add(object);
 
 // Main loop
 function loop(time: number) {
@@ -111,6 +117,8 @@ function loop(time: number) {
   if (slide_list[slide]) drawBackground(slide_list[slide]);
 
   draw();
+
+  level.draw(ctx, canvas.width, canvas.height);
 
   requestAnimationFrame(loop);
 }
