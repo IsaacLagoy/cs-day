@@ -33,60 +33,9 @@
 <style>
   .container {
     padding: 20px;
-    max-width: 400px;
+    max-width: 700px;
     margin: 0 auto;
-  }
-
-  .button-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 20px;
-  }
-
-  .button-row {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-  }
-
-  .control-btn {
-    padding: 25px;
-    font-size: 20px;
-    font-weight: bold;
-    border: 3px solid #333;
-    border-radius: 10px;
-    background: #f0f0f0;
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.1s;
-    min-width: 100px;
-  }
-
-  .control-btn:active {
-    transform: scale(0.95);
-    background: #d0d0d0;
-  }
-
-  .control-btn.pressed {
-    background: #4CAF50;
-    color: white;
-    border-color: #45a049;
-  }
-
-  .control-btn.disabled {
-    background: #cccccc;
-    color: #888;
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-
-  .control-btn.disabled:active {
-    transform: none;
-  }
-
-  .full-width {
-    flex: 1;
+    text-align: center;
   }
 
   .client-info {
@@ -94,7 +43,97 @@
     color: #666;
     margin-bottom: 10px;
   }
+
+  /* Controller overall layout */
+  .controller-layout {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 60px;
+    margin-top: 30px;
+  }
+
+  /* D-pad on left */
+  .dpad {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    align-items: center;
+  }
+
+  /* Action cluster on right */
+  .action-cluster {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .jump-btn {
+    margin-bottom: 15px;
+  }
+
+  /* A and B side by side (base of the triangle) */
+  .ab-row {
+    display: flex;
+    gap: 25px;
+  }
+
+  /* Base button styling */
+  .control-btn {
+    width: 80px;
+    height: 80px;
+    font-size: 20px;
+    font-weight: bold;
+    border: 3px solid #333;
+    border-radius: 50%;
+    background: #f0f0f0;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.1s ease;
+    box-shadow: 0 3px 0 #999;
+  }
+
+  .control-btn:active {
+    transform: scale(0.95) translateY(2px);
+    background: #d0d0d0;
+    box-shadow: 0 1px 0 #777;
+  }
+
+  .control-btn.pressed {
+    background: #4CAF50;
+    color: white;
+    border-color: #45a049;
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  /* MOBILE VIEW (same layout, but fills width) */
+  @media (max-width: 768px) {
+    .controller-layout {
+      gap: 40px;
+      padding: 0 20px;
+    }
+
+    .control-btn {
+      width: 70px;
+      height: 70px;
+      font-size: 18px;
+    }
+
+    .dpad {
+      gap: 20px;
+    }
+
+    .ab-row {
+      gap: 20px;
+    }
+
+    .jump-btn {
+      margin-bottom: 10px;
+    }
+  }
 </style>
+
 
 <div class="container">
   <h1>Controller</h1>
