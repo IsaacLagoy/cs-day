@@ -4,48 +4,19 @@ import type { Writable } from 'svelte/store';
 import { createClient } from '@supabase/supabase-js';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
-
-// Type definitions
-export interface ConnectedClient {
-  clientId: string;
-  role: string;
-}
-
-export interface BaseMessage {
-  type: string;
-  clientId: string;
-  role?: string;
-}
-
-export interface ClientJoinedMessage extends BaseMessage {
-  type: 'clientJoined';
-  role: string;
-}
-
-export interface ClientLeftMessage extends BaseMessage {
-  type: 'clientLeft';
-}
-
-export interface PlayerInputMessage extends BaseMessage {
-  type: 'playerInput';
-  role: string;
-  input: {
-    button: string;
-    pressed: boolean;
-  };
-}
-
-export interface GameUpdateMessage extends BaseMessage {
-  type: 'gameUpdate';
-  gameState: Record<string, any>;
-}
-
-export type Message = ClientJoinedMessage | ClientLeftMessage | GameUpdateMessage | PlayerInputMessage;
+import type { 
+    ConnectedClient, 
+    ButtonConfig, 
+    Message 
+} from '$lib/types';
 
 export interface WebSocketConnection {
-  send: (gameStateUpdate: Record<string, any>) => void;
-  sendInput: (button: string, pressed: boolean) => void;
-  clientId: string;
+    send: (gameStateUpdate: Record<string, any>) => void;
+    sendInput: (button: string, pressed: boolean) => void;
+    sendButtonConfig: (buttons: ButtonConfig[]) => void;
+    requestButtonConfig: () => void;
+    clientId: string;
+    disconnect: () => void;
 }
 
 // Stores
@@ -55,93 +26,157 @@ export const connectedClients: Writable<ConnectedClient[]> = writable([]);
 
 const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
 
+// Track active channels to prevent duplicates
+const activeChannels = new Map<string, RealtimeChannel>();
+
 export function connect(role: string, existingId?: string): WebSocketConnection {
-  const channel: RealtimeChannel = supabase.channel('game');
-
-  const id: string = existingId || crypto.randomUUID();
-  clientId.set(id);
-
-  // Persist if it's new
-  if (!existingId && typeof window !== 'undefined') {
-    localStorage.setItem('clientId', id);
-  }
-
-  // Broadcast join message
-  function announceJoin(): void {
-    channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: { type: 'clientJoined', clientId: id, role }
-    });
-  }
-
-  // Broadcast leave on unload
-  function announceLeave(): void {
-    channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: { type: 'clientLeft', clientId: id }
-    });
-  }
-
-  // Listen for messages
-  channel.on('broadcast', { event: 'message' }, (payload: { payload: Message }) => {
-    const msg: Message = payload.payload;
-
-    console.log('Received broadcast:', msg); // debug log
-
-    // Update general message store
-    messages.update((m) => [...m, msg]);
-
-    // Handle join
-    if (msg.type === 'clientJoined') {
-      connectedClients.update((c) => {
-        if (!c.find((x) => x.clientId === msg.clientId))
-          return [...c, { clientId: msg.clientId, role: msg.role }];
-        return c;
-      });
+    const id: string = existingId || crypto.randomUUID();
+    
+    // If this client already has an active connection, disconnect it first
+    if (activeChannels.has(id)) {
+        console.log('Cleaning up existing connection for', id);
+        const oldChannel = activeChannels.get(id);
+        oldChannel?.unsubscribe();
+        activeChannels.delete(id);
     }
 
-    // Handle leave
-    if (msg.type === 'clientLeft') {
-      connectedClients.update((c) =>
-        c.filter((x) => x.clientId !== msg.clientId)
-      );
+    clientId.set(id);
+
+    // Persist if it's new
+    if (!existingId && typeof window !== 'undefined') {
+        localStorage.setItem('clientId', id);
     }
-  });
 
-  channel.subscribe((status: string) => {
-    console.log('Supabase channel status:', status);
-    if (status === 'SUBSCRIBED') {
-      console.log(`Connected to Supabase Realtime as ${role}`);
-      announceJoin(); // announce join once subscribed
+    const channel: RealtimeChannel = supabase.channel(`game-${id}`, {
+        config: {
+            presence: {
+                key: id,
+            },
+        },
+    });
+
+    activeChannels.set(id, channel);
+
+    // Use Supabase Presence instead of manual broadcasts
+    channel.on('presence', { event: 'sync' }, () => {
+        const state = channel.presenceState();
+        const clients: ConnectedClient[] = [];
+        
+        for (const [presenceId, presences] of Object.entries(state)) {
+            const presence = presences[0] as any;
+            if (presence) {
+                clients.push({
+                    clientId: presence.clientId,
+                    role: presence.role
+                });
+            }
+        }
+        
+        connectedClients.set(clients);
+    });
+
+    channel.on('presence', { event: 'join' }, ({ key, newPresences }) => {
+        console.log('Client joined:', newPresences);
+    });
+
+    channel.on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+        console.log('Client left:', leftPresences);
+    });
+
+    // Listen for game messages
+    channel.on('broadcast', { event: 'message' }, (payload: { payload: Message }) => {
+        const msg: Message = payload.payload;
+        console.log('Received broadcast:', msg);
+        messages.update((m) => [...m, msg]);
+    });
+
+    let isSubscribed = false;
+
+    channel.subscribe(async (status: string) => {
+        console.log('Supabase channel status:', status);
+        if (status === 'SUBSCRIBED' && !isSubscribed) {
+            isSubscribed = true;
+            console.log(`Connected to Supabase Realtime as ${role}`);
+            
+            // Track presence
+            await channel.track({
+                clientId: id,
+                role: role,
+                online_at: new Date().toISOString(),
+            });
+        }
+    });
+
+    // Cleanup function
+    function disconnect(): void {
+        console.log('Disconnecting client', id);
+        channel.untrack();
+        channel.unsubscribe();
+        activeChannels.delete(id);
     }
-  });
 
-  if (typeof window !== 'undefined') {
-    window.addEventListener('beforeunload', () => announceLeave());
-  }
+    // Handle page unload
+    if (typeof window !== 'undefined') {
+        const handleUnload = () => {
+            // Use sendBeacon for more reliable cleanup
+            disconnect();
+        };
+        
+        window.addEventListener('beforeunload', handleUnload);
+        window.addEventListener('pagehide', handleUnload);
+        
+        // Store cleanup for later removal
+        (channel as any)._cleanupHandler = () => {
+            window.removeEventListener('beforeunload', handleUnload);
+            window.removeEventListener('pagehide', handleUnload);
+        };
+    }
 
-  function send(gameStateUpdate: Record<string, any>): void {
-    channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: { type: 'gameUpdate', clientId: id, role, gameState: gameStateUpdate }
-    });
-  }
+    function send(gameStateUpdate: Record<string, any>): void {
+        channel.send({
+            type: 'broadcast',
+            event: 'message',
+            payload: { type: 'gameUpdate', clientId: id, role, gameState: gameStateUpdate }
+        });
+    }
 
-  function sendInput(button: string, pressed: boolean): void {
-    channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: { 
-        type: 'playerInput', 
-        clientId: id, 
-        role,
-        input: { button, pressed }
-      }
-    });
-  }
+    function sendInput(button: string, pressed: boolean): void {
+        channel.send({
+            type: 'broadcast',
+            event: 'message',
+            payload: { 
+                type: 'playerInput', 
+                clientId: id, 
+                role,
+                input: { button, pressed }
+            }
+        });
+    }
 
-  return { send, sendInput, clientId: id };
+    function sendButtonConfig(buttons: ButtonConfig[]): void {
+        channel.send({
+            type: 'broadcast',
+            event: 'message',
+            payload: {
+                type: 'buttonConfig',
+                clientId: id,
+                role,
+                buttons
+            }
+        });
+    }
+
+    function requestButtonConfig(): void {
+        channel.send({
+            type: 'broadcast',
+            event: 'message',
+            payload: {
+                type: 'buttonConfigRequest',
+                clientId: id,
+                role
+            }
+        });
+    }
+
+    return { send, sendInput, sendButtonConfig, requestButtonConfig, clientId: id, disconnect };
 }

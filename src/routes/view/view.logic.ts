@@ -2,7 +2,8 @@
 import { derived, writable } from 'svelte/store';
 import type { Writable, Readable } from 'svelte/store';
 import { connect, messages, connectedClients } from '$lib/realtime';
-import type { WebSocketConnection, GameUpdateMessage, PlayerInputMessage, ConnectedClient } from '$lib/realtime';
+import type { WebSocketConnection,  } from '$lib/realtime';
+import type { GameUpdateMessage, PlayerInputMessage, ConnectedClient } from '$lib/types';
 
 export interface PlayerData {
   clientId: string;
@@ -107,6 +108,9 @@ export class GameViewController {
   }
 
   destroy(): void {
-    // Cleanup if needed
+    if (this.ws) {
+      this.ws.disconnect();
+      this.ws = undefined;
+    }
   }
 }

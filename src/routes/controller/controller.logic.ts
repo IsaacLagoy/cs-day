@@ -64,6 +64,9 @@ export class ControllerLogic {
   }
 
   destroy(): void {
-    // Cleanup if needed
+    if (this.ws) {
+      this.ws.disconnect();
+      this.ws = undefined;
+    }
   }
 }
