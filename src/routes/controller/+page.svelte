@@ -1,37 +1,27 @@
 <script lang="ts">
-  import { connect, clientId } from '$lib/realtime';
-  import type { WebSocketConnection } from '$lib/realtime';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
+  import { clientId } from '$lib/realtime';
+  import { ControllerLogic } from './controller.logic';
+  import type { ButtonName } from './controller.logic';
 
-  let ws: WebSocketConnection | undefined;
-  let buttonStates: Record<string, boolean> = {
-    jump: false,
-    duck: false,
-    left: false,
-    right: false
-  };
+  const controller = new ControllerLogic();
+  const { buttonStates } = controller;
 
   onMount(() => {
-    // Reuse existing clientId from localStorage if available
-    const savedId: string | null = localStorage.getItem('clientId');
-
-    if (!ws) {
-         ws = connect('controller', savedId ?? undefined);
-    }
+    const savedId = localStorage.getItem('clientId');
+    controller.connect(savedId ?? undefined);
   });
 
-  function handleButtonDown(button: string): void {
-    if (ws && !buttonStates[button]) {
-      buttonStates[button] = true;
-      ws.sendInput(button, true);
-    }
+  onDestroy(() => {
+    controller.destroy();
+  });
+
+  function handleButtonDown(button: ButtonName) {
+    controller.handleButtonDown(button);
   }
 
-  function handleButtonUp(button: string): void {
-    if (ws && buttonStates[button]) {
-      buttonStates[button] = false;
-      ws.sendInput(button, false);
-    }
+  function handleButtonUp(button: ButtonName) {
+    controller.handleButtonUp(button);
   }
 </script>
 
@@ -46,7 +36,7 @@
     on:touchend|preventDefault={() => handleButtonUp('jump')}
     style="padding: 20px; font-size: 18px;"
   >
-    Jump {buttonStates.jump ? '(Pressed)' : ''}
+    Jump {$buttonStates.jump ? '(Pressed)' : ''}
   </button>
   
   <button 
@@ -56,7 +46,7 @@
     on:touchend|preventDefault={() => handleButtonUp('duck')}
     style="padding: 20px; font-size: 18px;"
   >
-    Duck {buttonStates.duck ? '(Pressed)' : ''}
+    Duck {$buttonStates.duck ? '(Pressed)' : ''}
   </button>
   
   <div style="display: flex; gap: 10px;">
@@ -67,7 +57,7 @@
       on:touchend|preventDefault={() => handleButtonUp('left')}
       style="padding: 20px; font-size: 18px; flex: 1;"
     >
-      Left {buttonStates.left ? '(Pressed)' : ''}
+      Left {$buttonStates.left ? '(Pressed)' : ''}
     </button>
     
     <button 
@@ -77,7 +67,7 @@
       on:touchend|preventDefault={() => handleButtonUp('right')}
       style="padding: 20px; font-size: 18px; flex: 1;"
     >
-      Right {buttonStates.right ? '(Pressed)' : ''}
+      Right {$buttonStates.right ? '(Pressed)' : ''}
     </button>
   </div>
 </div>

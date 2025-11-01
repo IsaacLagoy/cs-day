@@ -1,27 +1,24 @@
 <script lang="ts">
-    import { connect } from '$lib/realtime';
-    import type { WebSocketConnection } from '$lib/realtime';
-    import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
+  import { HostLogic } from './host.logic';
 
-    let ws: WebSocketConnection | undefined;
+  const host = new HostLogic();
 
-    onMount(() => {
-        if (!ws) {
-            ws = connect('host');
-        }
-    });
+  onMount(() => {
+    host.connect();
+  });
 
-    function startGame(): void {
-        if (ws) {
-            ws.send({ started: true });
-        }
-    }
+  onDestroy(() => {
+    host.destroy();
+  });
 
-    function setFlag(name: string, value: boolean): void {
-        if (ws) {
-            ws.send({ [name]: value });
-        }
-    }
+  function startGame() {
+    host.startGame();
+  }
+
+  function setFlag(name: string, value: boolean) {
+    host.setFlag(name, value);
+  }
 </script>
 
 <h1>Host Controls</h1>
