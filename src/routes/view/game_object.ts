@@ -5,20 +5,25 @@ export class GameObject {
     scale: vec2;
     vel: vec2;
     color: string;
+    do_draw: boolean;
 
     collider: AABB;
 
-    constructor(position: vec2, scale: vec2={ x: 1, y: 1 }, color="#4400ffff") {
+    constructor(position: vec2, scale: vec2={ x: 1, y: 1 }, color="#4400ffff", do_draw=true) {
         this.position = position;
         this.scale = {x: scale.x, y: scale.y};
         this.vel = { x: 0, y: 0 };
         this.color = color;
+        this.do_draw = do_draw;
 
         this.collider = { topRight: {x: 0, y: 0}, bottomLeft: {x: 0, y: 0} };
         this.calcCollider();
     }
 
     draw(ctx: CanvasRenderingContext2D, width: number, height: number) {
+        
+        if (!this.do_draw) return;
+
         const tiles = 20;
         const imageAspect = 2560 / 1440;
 
