@@ -18,11 +18,11 @@ let slide_3: HTMLImageElement;
 // Load assets
 if (typeof window !== 'undefined') {
   slide_1 = new Image();
-  slide_1.src = '/src/lib/assets/slide-1.png'; 
+  slide_1.src = '/slide-1.png'; 
   slide_2 = new Image();
-  slide_2.src = '/src/lib/assets/slide-2.png'; 
+  slide_2.src = '/slide-2.png'; 
   slide_3 = new Image();
-  slide_3.src = '/src/lib/assets/slide-3.png'; 
+  slide_3.src = '/slide-3.png'; 
 
   slide_list = [slide_1, slide_2, slide_3, null];
 }
