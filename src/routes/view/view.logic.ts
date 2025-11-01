@@ -180,7 +180,6 @@ function update(deltaTime: number) {
   const levelChange = prev_level !== scene_list[scene].level && scene_list[scene].level !== level_1;
   prev_level = scene_list[scene].level;
 
-  const scene = gameState.scene;
   const do_gravity = (scene_list[scene].mode === "platformer");
 
   Object.values(currentPlayers).forEach(player => {
