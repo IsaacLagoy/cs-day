@@ -91,6 +91,33 @@ export class HostLogic {
     this.setFlag('level', this.level);
   }
 
+  resetScene(): void {
+    if (!this.ws) {
+      console.warn('WebSocket not connected');
+      return;
+    }
+    this.scene = 0;
+    this.setFlag('scene', this.scene);
+  }
+
+  incScene(): void {
+    if (!this.ws) {
+      console.warn('WebSocket not connected');
+      return;
+    }
+    this.scene++;
+    this.setFlag('scene', this.scene);
+  }
+
+  decScene(): void {
+    if (!this.ws) {
+      console.warn('WebSocket not connected');
+      return;
+    }
+    this.scene--;
+    this.setFlag('scene', this.scene);
+  }
+
   resetSlide(): void {
     if (!this.ws) {
       console.warn('WebSocket not connected');

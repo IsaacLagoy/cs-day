@@ -23,30 +23,44 @@
     function incSlide(): void { host.incSlide(); }
     function decSlide(): void { host.decSlide(); }
 
+    function resetScene(): void { host.resetScene(); }
+    function incScene(): void { host.incScene(); }
+    function decScene(): void { host.decScene(); }
+
     function toggleButton(buttonName: string) { host.toggleButton(buttonName); }
 </script>
 
 <h1>Host Controls</h1>
 
-<h3>Mode</h3>
+<div style="display: flex; justify-content: space-around;">
+<div>
+    <h3>Scene</h3>
 
-<button on:click={() => setMode('none')}>Set Mode None</button>
-<button on:click={() => setMode('fly')}>Set Mode Fly</button>
-<button on:click={() => setMode('platformer')}>Set Mode Platformer</button>
+    <button on:click={() => resetScene()}>Reset</button>
+    <button on:click={() => decScene()}>Scene Backward</button>
+    <button on:click={() => incScene()}>Scene Forward</button>
 
-<hr>
-<h3>Slide</h3>
+    <hr>
+    <h3>Mode</h3>
 
-<button on:click={() => resetSlide()}>Reset</button>
-<button on:click={() => decSlide()}>Slide Backward</button>
-<button on:click={() => incSlide()}>Slide Forward</button>
+    <button on:click={() => setMode('none')}>Set Mode None</button>
+    <button on:click={() => setMode('fly')}>Set Mode Fly</button>
+    <button on:click={() => setMode('platformer')}>Set Mode Platformer</button>
 
-<hr>
-<h3>Level</h3>
+    <hr>
+    <h3>Slide</h3>
 
-<button on:click={() => resetLevel()}>Reset</button>
-<button on:click={() => decLevel()}>Level Backward</button>
-<button on:click={() => incLevel()}>Level Forward</button>
+    <button on:click={() => resetSlide()}>Reset</button>
+    <button on:click={() => decSlide()}>Slide Backward</button>
+    <button on:click={() => incSlide()}>Slide Forward</button>
+
+    <hr>
+    <h3>Level</h3>
+
+    <button on:click={() => resetLevel()}>Reset</button>
+    <button on:click={() => decLevel()}>Level Backward</button>
+    <button on:click={() => incLevel()}>Level Forward</button>
+</div>
 
 <div class="container">
     <div class="section">
@@ -68,6 +82,7 @@
             {/each}
         </div>
     </div>
+</div>
 </div>
 
 
