@@ -19,9 +19,9 @@ export class Level {
         }
     }
 
-    update() {
+    update(deltaTime: number) {
         for (let index = 0; index < this.objects.length; index++) {
-            this.objects[index].update(0);
+            this.objects[index].update(deltaTime);
         }
     }
 }
