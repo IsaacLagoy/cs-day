@@ -21,6 +21,7 @@ let slide_5: HTMLImageElement;
 let slide_6: HTMLImageElement;
 let slide_7: HTMLImageElement;
 
+let prev_level: number = -1;
 
 let level_list: Array<Level | null>;
 let level_1: Level;
@@ -93,8 +94,14 @@ export function init(c: HTMLCanvasElement, controller: GameViewController) {
 }
 
 // Update player positions based on inputs
-function update(deltaTime: number, level: Level) {
+function update(deltaTime: number) {
   const currentPlayers = get(controllerInstance.players);
+
+  const gameState = get(controllerInstance.gameState);
+  let level = gameState.level;
+  console.log(`${prev_level}, ${level}`);
+  const levelChange = prev_level != level;
+  prev_level = level;
 
   Object.values(currentPlayers).forEach(player => {
     player.update(deltaTime)
@@ -104,6 +111,10 @@ function update(deltaTime: number, level: Level) {
 
     if (level_list[level] == null) {
         return;
+    }
+
+    if (levelChange) {
+        player.respawn();
     }
 
     level_list[level].update();
@@ -119,8 +130,6 @@ function update(deltaTime: number, level: Level) {
         }
     });
   });
-
-  
 }
 
 // Draw all players
@@ -178,7 +187,7 @@ function loop(time: number) {
   const deltaTime = (time - lastTime) * 0.001;
   lastTime = time;
 
-  update(deltaTime, level);
+  update(deltaTime);
   draw();
 
   requestAnimationFrame(loop);
