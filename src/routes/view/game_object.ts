@@ -18,10 +18,13 @@ export class GameObject {
     }
 
     draw(ctx: CanvasRenderingContext2D, width: number, height: number) {
-        const unit = 100;
+        const tiles = 20;
+        const unit = width / tiles;
+        const center = {x: width / 2, y: height / 2};
+        const offset = {x: center.x - this.scale.x / 2 - unit / 2, y: center.y - this.scale.y / 2 - unit / 2}
         
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.position.x * unit, this.position.y * unit, unit, unit);
+        ctx.fillRect(offset.x + this.position.x * unit, offset.y - this.position.y * unit, unit, unit);
     }
 
     calcCollider() {
