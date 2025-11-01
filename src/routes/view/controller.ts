@@ -16,7 +16,8 @@ export class GameViewController {
     this.gameState = writable({
         level: 0,
         mode: 'none',
-        slide: 0
+        slide: 0,
+        scene: 0,
     });
     this.players = writable({});
 

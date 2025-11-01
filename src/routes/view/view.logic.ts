@@ -6,6 +6,11 @@ import { GameObject } from './game_object';
 import { collide, getMTV } from './physics';
 import { MovingPlatform } from './moving_platform';
 
+interface Scene {
+    level: Level | null;
+    slide: HTMLImageElement;
+    mode: String;
+}
 
 // Game Rendering
 let canvas: HTMLCanvasElement;
@@ -39,6 +44,8 @@ let level_2: Level;
 let level_3: Level;
 let level_4: Level;
 let level_5: Level;
+
+let scene_list: Scene[];
 
 // Load assets
 if (typeof window !== 'undefined') {
@@ -121,6 +128,14 @@ if (typeof window !== 'undefined') {
   level_5.add(level_5_platform);
 
   level_list = [level_1, level_2, level_3, level_4, level_5, null];
+
+  // define scenes
+  scene_list = [
+        {level: null, slide: slide_1, mode: 'none'},
+        {level: null, slide: slide_2, mode: 'none'},
+        {level: null, slide: slide_3, mode: 'none'},
+        {level: level_1, slide: slide_3, mode: 'platformer'},
+    ]
 }
 
 
@@ -162,9 +177,9 @@ function update(deltaTime: number) {
     player.update(deltaTime, do_gravity);
 
     const gameState = get(controllerInstance.gameState);
-    let level = gameState.level;
+    let scene = gameState.scene;
 
-    if (level_list[level] == null) {
+    if (scene_list[scene].level == null) {
         return;
     }
 
@@ -172,11 +187,11 @@ function update(deltaTime: number) {
         player.respawn();
     }
 
-    level_list[level].update(deltaTime);
+    scene_list[scene].level.update(deltaTime);
 
     // collision
     player.canJump = false;
-    Object.values(level_list[level]?.objects).forEach(obj => {
+    Object.values(scene_list[scene].level?.objects).forEach(obj => {
         if (collide(player.collider, obj.collider)) {
             const mtv = getMTV(player.collider, obj.collider, player.vel);
             player.position.x += mtv.x;
@@ -197,14 +212,13 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const gameState = get(controllerInstance.gameState);
-  let slide = gameState.slide;
-  let level = gameState.level;
+  let scene = gameState.scene;
 
-  if (slide_list[slide]) drawBackground(slide_list[slide]);
+  if (scene_list[scene].slide) drawBackground(scene_list[scene].slide);
 
-  if (gameState.mode === 'none') return;
+  if (scene_list[scene].mode === 'none') return;
 
-  if (level_list[level]) level_list[level].draw(ctx, canvas.width, canvas.height);
+  if (scene_list[scene].level) scene_list[scene].level.draw(ctx, canvas.width, canvas.height);
 
   const currentPlayers = get(controllerInstance.players);
 
