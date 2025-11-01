@@ -5,30 +5,27 @@ export function collide(a: AABB, b: AABB): boolean {
         return false;
     }
 
-    if (a.bottomLeft.y < b.topRight.y || a.topRight.y > b.bottomLeft.y) {
+    if (a.bottomLeft.y > b.topRight.y || a.topRight.y < b.bottomLeft.y) {
         return false;
     }
 
     return true;
 }
 
+export function getMTV(a: AABB, b: AABB, vel: vec2): vec2 {
+    const ox1 = a.topRight.x - a.bottomLeft.x;
+    const ox2 = b.topRight.x - a.bottomLeft.x;
+    const oy1 = a.topRight.y - a.bottomLeft.y;
+    const oy2 = b.topRight.y - a.bottomLeft.y;
 
-// get a - b
-export function getMTV(posA: vec2, posB: vec2, scaleA: vec2, scaleB: vec2): vec2 {
-    const dx = posB.x - posA.x;
-    const px = (scaleA.x + scaleB.x) - Math.abs(dx);
+    const px = Math.abs(ox1) < Math.abs(ox2) ? ox1 : ox2;
+    const py = Math.abs(oy1) < Math.abs(oy2) ? oy1 : oy2;
 
-    if (px <= 0) return { x: 0, y: 0 }; // no overlap
-
-    const dy = posB.y - posA.y;
-    const py = (scaleA.y + scaleB.y) - Math.abs(dy);
-
-    if (py <= 0) return { x: 0, y: 0 }; // no overlap
-
-    // MTV is the smallest overlap axis, directed away from penetration
-    if (px < py) {
-        return { x: dx < 0 ? -px : px, y: 0 };
+    if (Math.abs(px) < Math.abs(py)) {
+        vel.x = 0;
+        return {x: px, y: 0};
     } else {
-        return { x: 0, y: dy < 0 ? -py : py };
+        vel.y = 0;
+        return {x: 0, y: py};
     }
 }

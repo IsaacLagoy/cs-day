@@ -69,8 +69,6 @@ export function init(c: HTMLCanvasElement, controller: GameViewController) {
   requestAnimationFrame(loop);
 }
 
-
-
 // Update player positions based on inputs
 function update(deltaTime: number, level: Level) {
   const currentPlayers = get(controllerInstance.players);
@@ -78,15 +76,27 @@ function update(deltaTime: number, level: Level) {
   Object.values(currentPlayers).forEach(player => {
     player.update(deltaTime)
 
+    const gameState = get(controllerInstance.gameState);
+    let level = gameState.level;
+
+    if (level_list[level] == null) {
+        return;
+    }
+
+    level_list[level].update();
+
     // collision
-    Object.values(level.objects).forEach(obj => {
+    Object.values(level_list[level]?.objects).forEach(obj => {
         if (collide(player.collider, obj.collider)) {
-            // const mtv = getMTV(player.position, obj.position, player.scale, obj.scale);
-            player.position.x = 0;
-            player.position.y = 0;
+            const mtv = getMTV(player.collider, obj.collider, player.vel);
+            player.position.x += mtv.x;
+            player.position.y += mtv.y;
+            player.vel.y = 0;
         }
     });
   });
+
+  
 }
 
 // Draw all players

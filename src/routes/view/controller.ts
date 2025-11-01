@@ -61,7 +61,7 @@ export class GameViewController {
             currentPlayers[playerId] = new Player(
               playerId,
               lastInput.role || 'controller',
-              {x: Math.random() * 5, y: Math.random() * 5},
+              {x: Math.random() * 10 - 5, y: Math.random() * 5},
               `#${playerId.replace(/-/g, '').slice(0, 6)}`
             );
           }
@@ -81,7 +81,7 @@ export class GameViewController {
             currentPlayers[client.clientId] = new Player(
               client.clientId,
               client.role,
-              {x: Math.random() * 5, y: Math.random() * 5},
+              {x: Math.random() * 10 - 5, y: Math.random() * 5},
               `#${client.clientId.replace(/-/g, '').slice(0, 6)}`
             );
           }

@@ -10,7 +10,7 @@ export class Player extends GameObject {
     inputs: Record<string, boolean>;
 
     constructor(clientId: string, role: string, position: vec2 = {x: 0, y: 0}, color='#fc4444ff', speed = 5) {
-        super(position, {x: 10, y: 10}, color);
+        super(position, {x: 1, y: 1}, color);
 
         this.clientId = clientId;
         this.role = role;
@@ -20,7 +20,7 @@ export class Player extends GameObject {
 
     update(deltaTime: number) {
         this.vel.x = this.speed * (Number(Boolean(this.inputs["right"])) - Number(Boolean(this.inputs["left"])));
-        this.vel.y = this.speed * (Number(Boolean(this.inputs["up"])) - Number(Boolean(this.inputs["down"])));
+        this.vel.y -= deltaTime * 9.8;
 
         super.update(deltaTime);
     }

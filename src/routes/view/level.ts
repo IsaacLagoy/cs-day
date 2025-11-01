@@ -18,4 +18,10 @@ export class Level {
             this.objects[index].draw(ctx, width, height);
         }
     }
+
+    update() {
+        for (let index = 0; index < this.objects.length; index++) {
+            this.objects[index].update(0);
+        }
+    }
 }
