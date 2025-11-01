@@ -55,6 +55,9 @@ let level_10: Level;
 let level_11: Level;
 let level_12: Level;
 let level_13: Level;
+let level_14: Level;
+let level_15: Level;
+let level_16: Level;
 
 let scene_list: Scene[];
 
@@ -211,9 +214,29 @@ if (typeof window !== 'undefined') {
   level_13.add(level_13_floor_left);
   level_13.add(level_13_floor_right);
   level_13.add(level_13_coin);
+
+
+  // Narative Levels
+  level_14 = new Level();
+  let level_14_start = new GameObject({x: -8.5, y: -3}, {x: 3, y: 10}, "#dfdfdfff");
+  let level_14_platform_1 = new MovingPlatform({x: -6, y: -5.5}, {x: -6, y: 1.75}, 5, {x: 2, y: 0.5}, "#dfdfdfff");
+  let level_14_floor = new GameObject({x: -5, y: -6}, {x: 6, y: 2}, "#dfdfdfff");
+  let level_14_wall = new GameObject({x: -4, y: 3}, {x: 2, y: 10}, "#dfdfdfff");
+  let level_14_platform_2 = new MovingPlatform({x: 1, y: -5}, {x: 1, y: -1}, 4, {x: 2, y: 0.5}, "#dfdfdfff");
+  let level_14_platform_3 = new MovingPlatform({x: 4, y: -1}, {x: 4, y: 1.75}, 2, {x: 2, y: 0.5}, "#dfdfdfff");
+  let level_14_end = new GameObject({x: 8.5, y: -2}, {x: 3, y: 10}, "#dfdfdfff");
+  level_14.add(level_14_start);
+  level_14.add(level_14_platform_1);
+  level_14.add(level_14_platform_2);
+  level_14.add(level_14_platform_3);
+  level_14.add(level_14_floor);
+  level_14.add(level_14_wall);
+  level_14.add(level_14_end);
+
   
   // define scenes
   scene_list = [
+        {level: level_14, slide: null, mode: 'platformer'},
         {level: null, slide: slide_1, mode: 'none'},
         {level: null, slide: slide_2, mode: 'none'},
         {level: null, slide: slide_3, mode: 'none'},
