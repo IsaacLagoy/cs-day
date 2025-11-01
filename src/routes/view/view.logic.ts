@@ -7,9 +7,10 @@ let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 let controllerInstance: GameViewController;
 let lastTime = 0;
+let slide_list: Array<HTMLImageElement | null>;
 let slide_1: HTMLImageElement;
 let slide_2: HTMLImageElement;
-let slide_list: Array<HTMLImageElement>;
+let slide_3: HTMLImageElement;
 
 // Load assets
 if (typeof window !== 'undefined') {
@@ -17,8 +18,10 @@ if (typeof window !== 'undefined') {
   slide_1.src = '/src/lib/assets/slide-1.png'; 
   slide_2 = new Image();
   slide_2.src = '/src/lib/assets/slide-2.png'; 
+  slide_3 = new Image();
+  slide_3.src = '/src/lib/assets/slide-3.png'; 
 
-  slide_list = [slide_1, slide_2];
+  slide_list = [slide_1, slide_2, slide_3, null];
 }
 
 
@@ -93,7 +96,10 @@ function drawBackground(image: HTMLImageElement) {
 
 // Main loop
 function loop(time: number) {
+  const gameState = get(controllerInstance.gameState);
+
   const deltaTime = (time - lastTime) * 0.001;
+  let slide = gameState.slide;
   lastTime = time;
 
   update(deltaTime);
@@ -102,11 +108,9 @@ function loop(time: number) {
   ctx.fillStyle = '#111';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-
-  drawBackground(slide_list[0]);
+  if (slide_list[slide]) drawBackground(slide_list[slide]);
 
   draw();
-
 
   requestAnimationFrame(loop);
 }
