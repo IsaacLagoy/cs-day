@@ -19,6 +19,7 @@ let controllerInstance: GameViewController;
 let lastTime = 0;
 
 let slide_list: Array<HTMLImageElement | null>;
+let QR: HTMLImageElement;
 let slide_1: HTMLImageElement;
 let slide_2: HTMLImageElement;
 let slide_3: HTMLImageElement;
@@ -26,10 +27,18 @@ let slide_4: HTMLImageElement;
 let slide_5: HTMLImageElement;
 let slide_6: HTMLImageElement;
 let slide_7: HTMLImageElement;
+let slide_8: HTMLImageElement;
+let slide_9: HTMLImageElement;
+let slide_10: HTMLImageElement;
+let slide_11: HTMLImageElement;
+let bg_1: HTMLImageElement;
+let bg_2: HTMLImageElement;
+let bg_3: HTMLImageElement;
 
 let prev_level: number = -1;
 
 let level_list: Array<Level | null>;
+let test_level: Level;
 let level_1: Level;
 let level_2: Level;
 let level_3: Level;
@@ -54,9 +63,35 @@ if (typeof window !== 'undefined') {
   slide_6.src = '/slide-6.png'; 
   slide_7 = new Image();
   slide_7.src = '/slide-7.png'; 
+  slide_8 = new Image();
+  slide_8.src = '/slide-8.png'; 
+  slide_9 = new Image();
+  slide_9.src = '/slide-9.png'; 
+  slide_10 = new Image();
+  slide_10.src = '/slide-10.png'; 
+  slide_11 = new Image();
+  slide_11.src = '/slide-11.png'; 
 
-  slide_list = [slide_1, slide_2, slide_3, slide_4, slide_5, slide_6, slide_7, null];
+  bg_1 = new Image();
+  bg_1.src = '/bg-1.png'; 
+  bg_2 = new Image();
+  bg_2.src = '/bg-2.png'; 
+  bg_3 = new Image();
+  bg_3.src = '/bg-3.png'; 
 
+  slide_list = [slide_1, slide_2, slide_3, slide_4, slide_5, slide_6, slide_7, slide_8, slide_9, slide_10, slide_11, bg_1, bg_2, bg_3, null];
+
+  // // SLIDE 10
+  // test_level = new Level();
+  // let test_level_left = new GameObject({x: -5.95, y: -1.45}, {x: 5.35, y: 4.3}, "#941a1a", false);
+  // let test_level_right = new GameObject({x: 4.35, y: -1.1}, {x: 10.9, y: 8.65}, "#941a1a", false);
+  // test_level.add(test_level_left);
+  // test_level.add(test_level_right);
+
+  // // SLIDE 11
+  // test_level = new Level();
+  // let test_level_floor = new GameObject({x: 0, y: 0.25}, {x: 17, y: 0.5}, "#ffffffff");
+  // test_level.add(test_level_floor);
 
   level_1 = new Level();
   let level_1_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
@@ -99,7 +134,7 @@ if (typeof window !== 'undefined') {
         {level: null, slide: slide_1, mode: 'none'},
         {level: null, slide: slide_2, mode: 'none'},
         {level: null, slide: slide_3, mode: 'none'},
-        {level: level_1, slide: slide_3, mode: 'none'},
+        {level: level_1, slide: slide_3, mode: 'platformer'},
     ]
 }
 
@@ -178,6 +213,9 @@ function draw() {
   let scene = gameState.scene;
 
   if (scene_list[scene].slide) drawBackground(scene_list[scene].slide);
+
+  if (scene_list[scene].mode === 'none') return;
+
   if (scene_list[scene].level) scene_list[scene].level.draw(ctx, canvas.width, canvas.height);
 
   const currentPlayers = get(controllerInstance.players);
