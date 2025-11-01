@@ -19,9 +19,9 @@ export class Player extends GameObject {
     }
 
     update(deltaTime: number) {
-        if (this.inputs["right"]) this.position.x += this.speed * deltaTime;
-        if (this.inputs["left"]) this.position.x -= this.speed * deltaTime;
-        if (this.inputs["up"]) this.position.y += this.speed * deltaTime;
-        if (this.inputs["down"]) this.position.y -= this.speed * deltaTime;
+        this.vel.x = this.speed * (Number(Boolean(this.inputs["right"])) - Number(Boolean(this.inputs["left"])));
+        this.vel.y = this.speed * (Number(Boolean(this.inputs["up"])) - Number(Boolean(this.inputs["down"])));
+
+        super.update(deltaTime);
     }
 }

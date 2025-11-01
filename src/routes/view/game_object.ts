@@ -8,7 +8,7 @@ export class GameObject {
 
     collider: AABB;
 
-    constructor(position: vec2, scale: vec2={x: 1, y: 1}, color="#4400ffff") {
+    constructor(position: vec2, scale: vec2={ x: 1, y: 1 }, color="#4400ffff") {
         this.position = position;
         this.scale = scale;
         this.vel = { x: 0, y: 0 };
@@ -29,5 +29,10 @@ export class GameObject {
         this.collider.topRight.y = this.position.y * this.scale.y;
         this.collider.bottomLeft.x = -this.position.x * this.scale.x;
         this.collider.bottomLeft.y = -this.position.y * this.scale.y;
+    }
+
+    update(time: number) {
+        this.position.x += this.vel.x * time;
+        this.position.y += this.vel.y * time;
     }
 }
