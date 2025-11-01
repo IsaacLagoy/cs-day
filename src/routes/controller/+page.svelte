@@ -8,7 +8,9 @@
     // Reuse existing clientId from localStorage if available
     const savedId = localStorage.getItem('clientId');
 
-    ws = connect('controller', savedId); // pass savedId to connect
+    if (!ws) {
+         ws = connect('controller', savedId); // pass savedId to connect
+    }
   });
 
   function sendInput(input) {

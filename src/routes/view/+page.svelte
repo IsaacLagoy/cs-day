@@ -7,7 +7,9 @@
   let gameState = {};
 
   onMount(() => {
-    ws = connect('view');
+    if (!ws) {
+        ws = connect('view');
+    }
   });
 
   // Listen for game updates

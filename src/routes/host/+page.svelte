@@ -1,20 +1,22 @@
 <script>
-  import { connect } from '$lib/realtime';
-  import { onMount } from 'svelte';
+    import { connect } from '$lib/realtime';
+    import { onMount } from 'svelte';
 
-  let ws;
+    let ws;
 
-  onMount(() => {
-    ws = connect('host');
-  });
+    onMount(() => {
+        if (!ws) {
+            ws = connect('host');
+        }
+    });
 
-  function startGame() {
-    ws.send({ started: true });
-  }
+    function startGame() {
+            ws.send({ started: true });
+    }
 
-  function setFlag(name, value) {
-    ws.send({ [name]: value });
-  }
+    function setFlag(name, value) {
+            ws.send({ [name]: value });
+    }
 </script>
 
 <h1>Host Controls</h1>
