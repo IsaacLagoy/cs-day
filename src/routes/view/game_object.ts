@@ -20,12 +20,20 @@ export class GameObject {
 
     draw(ctx: CanvasRenderingContext2D, width: number, height: number) {
         const tiles = 20;
-        const unit = width / tiles;
+        const imageAspect = 2560 / 1440;
+
+        let unit: number;
+        if (width / height > imageAspect) {
+            unit = (height * imageAspect) / tiles;
+        } else {
+            unit = width / tiles;
+        }
+
         const center = {x: width / 2, y: height / 2};
-        const offset = {x: center.x - this.scale.x / 2 - unit / 2, y: center.y - this.scale.y / 2 - unit / 2}
+        const offset = {x: center.x - this.scale.x * unit  / 2, y: center.y - this.scale.y * unit / 2}
         
         ctx.fillStyle = this.color;
-        ctx.fillRect(offset.x + this.position.x * unit, offset.y - this.position.y * unit, unit, unit);
+        ctx.fillRect(offset.x + this.position.x * unit, offset.y - this.position.y * unit, this.scale.x * unit, this.scale.y * unit);
     }
 
     calcCollider() {

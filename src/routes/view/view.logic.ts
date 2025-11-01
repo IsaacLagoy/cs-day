@@ -11,10 +11,15 @@ let canvas: HTMLCanvasElement;
 let ctx: CanvasRenderingContext2D;
 let controllerInstance: GameViewController;
 let lastTime = 0;
+
 let slide_list: Array<HTMLImageElement | null>;
 let slide_1: HTMLImageElement;
 let slide_2: HTMLImageElement;
 let slide_3: HTMLImageElement;
+
+let level_list: Array<Level | null>;
+let level_1: Level;
+let level_2: Level;
 
 // Load assets
 if (typeof window !== 'undefined') {
@@ -26,6 +31,19 @@ if (typeof window !== 'undefined') {
   slide_3.src = '/slide-3.png'; 
 
   slide_list = [slide_1, slide_2, slide_3, null];
+
+
+  level_1 = new Level();
+  let level_1_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
+  level_1.add(level_1_floor);
+
+  level_2 = new Level();
+  let level_2_floor_left = new GameObject({x: -5, y: -5}, {x: 3, y: 2}, "#dfdfdfff");
+  let level_2_floor_right = new GameObject({x: 5, y: -5}, {x: 3, y: 2}, "#dfdfdfff");
+  level_2.add(level_2_floor_left);
+  level_2.add(level_2_floor_right);
+
+  level_list = [level_1, level_2, null];
 }
 
 
@@ -73,6 +91,17 @@ function update(deltaTime: number, level: Level) {
 
 // Draw all players
 function draw() {
+  // Clear the screen
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const gameState = get(controllerInstance.gameState);
+  let slide = gameState.slide;
+  let level = gameState.level;
+
+  if (slide_list[slide]) drawBackground(slide_list[slide]);
+  if (level_list[level]) level_list[level].draw(ctx, canvas.width, canvas.height);
+
   const currentPlayers = get(controllerInstance.players);
 
   Object.values(currentPlayers).forEach(player => {
@@ -112,23 +141,11 @@ level.add(object);
 
 // Main loop
 function loop(time: number) {
-  const gameState = get(controllerInstance.gameState);
-
   const deltaTime = (time - lastTime) * 0.001;
-  let slide = gameState.slide;
   lastTime = time;
 
   update(deltaTime, level);
-
-  // Clear the screen
-  ctx.fillStyle = '#111';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  if (slide_list[slide]) drawBackground(slide_list[slide]);
-
   draw();
-
-  level.draw(ctx, canvas.width, canvas.height);
 
   requestAnimationFrame(loop);
 }
