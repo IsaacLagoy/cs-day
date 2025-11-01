@@ -30,7 +30,7 @@ export class Player {
     draw(ctx: CanvasRenderingContext2D) {
         if (!ctx) return;
         ctx.fillStyle = this.color;
-        ctx.fillRect(this.pos.x, this.pos.y, unit, unit);
+        ctx.fillRect(this.pos.x * unit, this.pos.y * unit, unit, unit);
     }
 
     update(deltaTime: number) {

@@ -61,8 +61,9 @@ export class GameViewController {
             currentPlayers[playerId] = new Player(
               playerId,
               lastInput.role || 'controller',
-              Math.random() * 400,
-              300
+              Math.random() * 10,
+              Math.random() * 10,
+              `#${playerId.replace(/-/g, '').slice(0, 6)}`
             );
           }
 
