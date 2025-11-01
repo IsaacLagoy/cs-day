@@ -1,6 +1,6 @@
 // src/routes/host/host.logic.ts
 import { connect } from '$lib/realtime';
-import type { WebSocketConnection } from '$lib/realtime';
+import { disconnectAll, type WebSocketConnection } from '$lib/realtime';
 import type { ButtonConfig } from '$lib/types';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
