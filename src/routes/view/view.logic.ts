@@ -45,16 +45,15 @@ if (typeof window !== 'undefined') {
 
   slide_list = [slide_1, slide_2, slide_3, slide_4, slide_5, slide_6, slide_7, null];
 
-
   level_1 = new Level();
   let level_1_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
   level_1.add(level_1_floor);
 
   level_2 = new Level();
-  let level_2_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
-  let level_2_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
-  level_2.add(level_2_floor_left);
-  level_2.add(level_2_floor_right);
+  let level_2_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
+  let level_2_goal = new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#0ab307ff");
+  level_2.add(level_2_floor);
+  level_2.add(level_2_goal);
 
   level_list = [level_1, level_2, null];
 }
