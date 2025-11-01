@@ -48,6 +48,9 @@ let level_5: Level;
 let level_6: Level;
 let level_7: Level;
 let level_8: Level;
+let level_9: Level;
+let level_10: Level;
+let level_11: Level;
 
 let scene_list: Scene[];
 
@@ -108,17 +111,21 @@ if (typeof window !== 'undefined') {
   let level_4_floor_left = new GameObject({x: -7, y: -5}, {x: 6, y: 2}, "#dfdfdfff");
   let level_4_floor_mid = new GameObject({x: 0, y: -4}, {x: 2, y: 4}, "#dfdfdfff");
   let level_4_floor_right = new GameObject({x: 7, y: -3}, {x: 6, y: 6}, "#dfdfdfff");
+  let level_4_goal = new GameObject({x: 7, y: -0.5}, {x: 4, y: 1}, "#72e56cff");
   level_4.add(level_4_floor_left);
   level_4.add(level_4_floor_mid);
   level_4.add(level_4_floor_right);
+  level_4.add(level_4_goal);
   
   level_5 = new Level();
   let level_5_floor_left = new GameObject({x: -7, y: -5}, {x: 6, y: 2}, "#dfdfdfff");
   let level_5_platform = new MovingPlatform({x: 0, y: -4.25}, {x: 0, y: -.25}, 5, {x: 2, y: 0.5}, "#dfdfdfff");
   let level_5_floor_right = new GameObject({x: 7, y: -3}, {x: 6, y: 6}, "#dfdfdfff");
+  let level_5_goal = new GameObject({x: 7, y: -0.5}, {x: 4, y: 1}, "#72e56cff");
   level_5.add(level_5_floor_left);
   level_5.add(level_5_floor_right);
   level_5.add(level_5_platform);
+  level_5.add(level_5_goal);
   
   // SLIDE 9
   level_8 = new Level();
@@ -137,7 +144,36 @@ if (typeof window !== 'undefined') {
   let level_7_floor = new GameObject({x: 0, y: 0.25}, {x: 17, y: 0.5}, "#c8c8c8ff");
   level_7.add(level_7_floor);
 
-  
+  // VIBE SWITCH
+  level_9 = new Level();
+  let level_9_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#6c9affff");
+  let level_9_mid = new GameObject({x: 0, y: 1}, {x: 3, y: 0.5}, "#e4b746ff");
+  let level_9_left = new GameObject({x: -6, y: -2}, {x: 3, y: 0.5}, "#e4b746ff");
+  let level_9_right = new GameObject({x: 6, y: -2}, {x: 3, y: 0.5}, "#e4b746ff");
+  level_9.add(level_9_floor);
+  level_9.add(level_9_mid);
+  level_9.add(level_9_left);
+  level_9.add(level_9_right);
+
+  level_10 = new Level();
+  let level_10_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#9a5a19ff");
+  let level_10_mid = new GameObject({x: 0, y: 1}, {x: 3, y: 0.5}, "#f8912aff");
+  let level_10_left = new GameObject({x: -6, y: -2}, {x: 3, y: 0.5}, "#f8912aff");
+  let level_10_right = new GameObject({x: 6, y: -2}, {x: 3, y: 0.5}, "#f8912aff");
+  level_10.add(level_10_floor);
+  level_10.add(level_10_mid);
+  level_10.add(level_10_left);
+  level_10.add(level_10_right);
+
+  level_11 = new Level();
+  let level_11_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#3eac3eff");
+  let level_11_mid = new GameObject({x: 0, y: 1}, {x: 3, y: 0.5}, "#926b45ff");
+  let level_11_left = new GameObject({x: -6, y: -2}, {x: 3, y: 0.5}, "#926b45ff");
+  let level_11_right = new GameObject({x: 6, y: -2}, {x: 3, y: 0.5}, "#926b45ff");
+  level_11.add(level_11_floor);
+  level_11.add(level_11_mid);
+  level_11.add(level_11_left);
+  level_11.add(level_11_right);
   
   // define scenes
   scene_list = [
@@ -157,6 +193,9 @@ if (typeof window !== 'undefined') {
         {level: level_8, slide: slide_9, mode: 'platformer'},
         {level: level_6, slide: slide_10, mode: 'platformer'},
         {level: level_7, slide: slide_11, mode: 'platformer'},
+        {level: level_9, slide: bg_1, mode: 'platformer'},
+        {level: level_10, slide: bg_2, mode: 'platformer'},
+        {level: level_11, slide: bg_3, mode: 'platformer'},
     ]
 }
 
@@ -194,19 +233,17 @@ function update(deltaTime: number) {
 
   const do_gravity = (scene_list[scene].mode === "platformer");
 
+  if (scene_list[scene].level === null) return;
+  scene_list[scene].level.update(deltaTime);
+
   Object.values(currentPlayers).forEach(player => {
     player.update(deltaTime, do_gravity);
-
-    const gameState = get(controllerInstance.gameState);
-    let scene = gameState.scene;
 
     if (scene_list[scene].level === null) return;
 
     if (levelChange) {
         player.respawn();
     }
-
-    scene_list[scene].level.update(deltaTime);
 
     // collision
     player.canJump = false;
