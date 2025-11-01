@@ -24,19 +24,24 @@
 <h1>Host Controls</h1>
 
 <h2>Game Settings</h2>
+<hr>
+<h3>Mode</h3>
 
 <button on:click={() => setMode('none')}>Set Mode None</button>
 <button on:click={() => setMode('fly')}>Set Mode Fly</button>
 <button on:click={() => setMode('platformer')}>Set Mode Platformer</button>
 
 <hr>
+<h3>Slide</h3>
 
-<button on:click={() => incSlide()}>Slide Forward</button>
 <button on:click={() => decSlide()}>Slide Backward</button>
+<button on:click={() => incSlide()}>Slide Forward</button>
 
 <hr>
+<h3>Level</h3>
 
-<button on:click={() => incLevel()}>Level Forward</button>
 <button on:click={() => decLevel()}>Level Backward</button>
+<button on:click={() => incLevel()}>Level Forward</button>
+
 
 <h2>Player Settings</h2>
