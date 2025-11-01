@@ -1,24 +1,24 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
-  import { HostLogic } from './host.logic';
+    import { onMount, onDestroy } from 'svelte';
+    import { HostLogic } from './host.logic';
 
-  const host = new HostLogic();
+    const host = new HostLogic();
 
-  onMount(() => {
-    host.connect();
-  });
+    onMount(() => {
+        host.connect();
+    });
 
-  onDestroy(() => {
-    host.destroy();
-  });
+    onDestroy(() => {
+        host.destroy();
+    });
 
-  function startGame() {
-    host.startGame();
-  }
+    function startGame() {
+        host.startGame();
+    }
 
-  function setFlag(name: string, value: boolean) {
-    host.setFlag(name, value);
-  }
+    function setFlag(name: string, value: boolean) {
+        host.setFlag(name, value);
+    }
 </script>
 
 <h1>Host Controls</h1>

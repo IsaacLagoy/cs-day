@@ -1,3 +1,4 @@
+/* Networking */
 export interface ConnectedClient {
     clientId: string;
     role: string;
@@ -51,3 +52,14 @@ export interface ButtonConfigRequestMessage extends BaseMessage {
 }
 
 export type Message = ClientJoinedMessage | ClientLeftMessage | GameUpdateMessage | PlayerInputMessage | ButtonConfigMessage | ButtonConfigRequestMessage;
+
+/* Physics */
+export interface vec2 {
+    x: number;
+    y: number;
+}
+
+export interface AABB {
+    topRight: vec2;
+    bottomLeft: vec2;
+}

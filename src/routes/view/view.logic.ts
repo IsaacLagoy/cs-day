@@ -26,11 +26,11 @@ export class GameViewController {
 
     // Derived stores for filtered messages
     this.gameUpdates = derived(messages, ($m) =>
-      $m.filter((msg): msg is GameUpdateMessage => msg.type === 'gameUpdate')
+        $m.filter((msg): msg is GameUpdateMessage => msg.type === 'gameUpdate')
     );
 
     this.playerInputs = derived(messages, ($m) =>
-      $m.filter((msg): msg is PlayerInputMessage => msg.type === 'playerInput')
+        $m.filter((msg): msg is PlayerInputMessage => msg.type === 'playerInput')
     );
 
     // Subscribe to updates
