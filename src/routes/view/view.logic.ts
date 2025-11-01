@@ -3,7 +3,7 @@ import { derived, writable, get } from 'svelte/store';
 import type { Writable, Readable } from 'svelte/store';
 import { connect, messages, connectedClients } from '$lib/realtime';
 import type { WebSocketConnection } from '$lib/realtime';
-import type { GameUpdateMessage, PlayerInputMessage, ConnectedClient } from '$lib/types'
+import type { GameUpdateMessage, PlayerInputMessage, ConnectedClient, vec2, AABB } from '$lib/types'
 
 // Game Rendering
 let canvas: HTMLCanvasElement;
@@ -13,25 +13,38 @@ let lastTime = 0;
 let unit = 100;
 
 export class Player {
-  clientId: string;
-  role: string;
-  x: number;
-  y: number;
-  inputs: Record<string, boolean>;
+    clientId: string;
+    role: string;
+    pos: vec2;
+    vel: vec2;
+    scale: vec2;
+    inputs: Record<string, boolean>;
 
-  constructor(clientId: string, role: string, x = 0, y = 0) {
-    this.clientId = clientId;
-    this.role = role;
-    this.x = x;
-    this.y = y;
-    this.inputs = {};
-  }
+    // physics
+    collider: AABB;
 
-  draw() {
-    if (!ctx) return;
-    ctx.fillStyle = '#fc4444ff';
-    ctx.fillRect(this.x, this.y, unit, unit);
-  }
+    constructor(clientId: string, role: string, x = 0, y = 0) {
+        this.clientId = clientId;
+        this.role = role;
+        this.pos = { x: x, y: y };
+        this.vel = { x: 0, y: 0 };
+        this.scale = { x: 1, y: 1 };
+        this.collider = { topRight: this.pos, bottomLeft: this.pos }; // temporary value
+        this.inputs = {};
+    }
+
+    draw() {
+        if (!ctx) return;
+        ctx.fillStyle = '#fc4444ff';
+        ctx.fillRect(this.pos.x, this.pos.y, unit, unit);
+    }
+
+    calcCollider() {
+        this.collider.topRight.x = this.pos.x * this.scale.x;
+        this.collider.topRight.y = this.pos.y * this.scale.y;
+        this.collider.bottomLeft.x = -this.pos.x * this.scale.x;
+        this.collider.bottomLeft.y = -this.pos.y * this.scale.y;
+    }
 }
 
 export class GameViewController {
@@ -149,8 +162,8 @@ function update() {
   const currentPlayers = get(controllerInstance.players);
 
   Object.values(currentPlayers).forEach(player => {
-    if (player.inputs["right"]) player.x += 1;
-    if (player.inputs["left"]) player.x -= 1;
+    if (player.inputs["right"]) player.pos.x += 1;
+    if (player.inputs["left"]) player.pos.y -= 1;
   });
 }
 

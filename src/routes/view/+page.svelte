@@ -40,7 +40,7 @@
 {#each Object.values($players) as player}
   <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px; z-index: 15;">
     <h3>Player: {player.clientId.slice(0, 8)}... {player.clientId === $clientId ? '(You)' : ''}</h3>
-    <p>Position: ({player.x.toFixed(0)}, {player.y.toFixed(0)})</p>
+    <p>Position: ({player.pos.x.toFixed(0)}, {player.pos.y.toFixed(0)})</p>
     <p>Inputs:</p>
     <ul>
       {#each Object.entries(player.inputs) as [button, pressed]}
