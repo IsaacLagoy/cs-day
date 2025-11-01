@@ -32,6 +32,8 @@ let slide_8: HTMLImageElement;
 let slide_9: HTMLImageElement;
 let slide_10: HTMLImageElement;
 let slide_11: HTMLImageElement;
+let slide_12: HTMLImageElement;
+let slide_13: HTMLImageElement;
 let bg_1: HTMLImageElement;
 let bg_2: HTMLImageElement;
 let bg_3: HTMLImageElement;
@@ -52,6 +54,7 @@ let level_9: Level;
 let level_10: Level;
 let level_11: Level;
 let level_12: Level;
+let level_13: Level;
 
 let scene_list: Scene[];
 
@@ -79,6 +82,10 @@ if (typeof window !== 'undefined') {
   slide_10.src = '/slide-10.png'; 
   slide_11 = new Image();
   slide_11.src = '/slide-11.png'; 
+  slide_12 = new Image();
+  slide_12.src = '/slide-12.png'; 
+  slide_13 = new Image();
+  slide_13.src = '/slide-13.png'; 
 
   bg_1 = new Image();
   bg_1.src = '/bg-1.png'; 
@@ -116,21 +123,29 @@ if (typeof window !== 'undefined') {
   let level_4_floor_mid = new GameObject({x: 0, y: -4}, {x: 2, y: 4}, "#dfdfdfff");
   let level_4_floor_right = new GameObject({x: 7, y: -3}, {x: 6, y: 6}, "#dfdfdfff");
   let level_4_goal = new GameObject({x: 7, y: -0.5}, {x: 4, y: 1}, "#72e56cff");
+  let level_4_coin_1 = new Coin({x: -2.5, y: 0});
+  let level_4_coin_2 = new Coin({x: 2.5, y: 2});
+  let level_4_coin_3 = new Coin({x: -4, y: 2});
   level_4.add(level_4_floor_left);
   level_4.add(level_4_floor_mid);
   level_4.add(level_4_floor_right);
   level_4.add(level_4_goal);
+  level_4.add(level_4_coin_1);
+  level_4.add(level_4_coin_2);
+  level_4.add(level_4_coin_3);
   
   level_5 = new Level();
   let level_5_floor_left = new GameObject({x: -7, y: -5}, {x: 6, y: 2}, "#dfdfdfff");
   let level_5_platform = new MovingPlatform({x: 0, y: -4.25}, {x: 0, y: -.25}, 5, {x: 2, y: 0.5}, "#dfdfdfff");
   let level_5_floor_right = new GameObject({x: 7, y: -3}, {x: 6, y: 6}, "#dfdfdfff");
   let level_5_goal = new GameObject({x: 7, y: -0.5}, {x: 4, y: 1}, "#72e56cff");
+  let level_5_coin = new Coin({x: 0, y: 4});
   level_5.add(level_5_floor_left);
   level_5.add(level_5_floor_right);
   level_5.add(level_5_platform);
   level_5.add(level_5_goal);
-  
+  level_5.add(level_5_coin);
+
   // SLIDE 9
   level_8 = new Level();
   let level_8_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
@@ -188,6 +203,14 @@ if (typeof window !== 'undefined') {
   level_12.add(level_12_mid);
   level_12.add(level_12_left);
   level_12.add(level_12_right);
+
+  level_13 = new Level();
+  let level_13_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
+  let level_13_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
+  let level_13_coin = new Coin({x: 0, y: 0});
+  level_13.add(level_13_floor_left);
+  level_13.add(level_13_floor_right);
+  level_13.add(level_13_coin);
   
   // define scenes
   scene_list = [
@@ -201,16 +224,17 @@ if (typeof window !== 'undefined') {
         {level: null, slide: QR, mode: 'fly'},
         {level: level_1, slide: QR, mode: 'platformer'},
         {level: level_2, slide: null, mode: 'platformer'},
+        {level: level_2, slide: slide_9, mode: 'platformer'},
+        {level: level_6, slide: slide_10, mode: 'platformer'},
         {level: level_3, slide: null, mode: 'platformer'},
+        {level: level_7, slide: slide_11, mode: 'platformer'},
         {level: level_4, slide: null, mode: 'platformer'},
         {level: level_5, slide: null, mode: 'platformer'},
-        {level: level_8, slide: slide_9, mode: 'platformer'},
-        {level: level_6, slide: slide_10, mode: 'platformer'},
-        {level: level_7, slide: slide_11, mode: 'platformer'},
         {level: level_12, slide: null, mode: 'platformer'},
         {level: level_9, slide: bg_1, mode: 'platformer'},
         {level: level_10, slide: bg_2, mode: 'platformer'},
         {level: level_11, slide: bg_3, mode: 'platformer'},
+        {level: level_13, slide: slide_13, mode: 'platformer'},
     ]
 }
 
