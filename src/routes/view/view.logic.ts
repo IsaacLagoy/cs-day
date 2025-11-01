@@ -35,7 +35,7 @@ let bg_1: HTMLImageElement;
 let bg_2: HTMLImageElement;
 let bg_3: HTMLImageElement;
 
-let prev_level: number = -1;
+let prev_level: Level | null;
 
 let level_list: Array<Level | null>;
 let test_level: Level;
@@ -176,10 +176,9 @@ function update(deltaTime: number) {
   const currentPlayers = get(controllerInstance.players);
 
   const gameState = get(controllerInstance.gameState);
-  let level = gameState.level;
-  console.log(`${prev_level}, ${level}`);
-  const levelChange = prev_level != level;
-  prev_level = level;
+  let scene = gameState.scene;
+  const levelChange = prev_level !== scene_list[scene].level && scene_list[scene].level !== level_1;
+  prev_level = scene_list[scene].level;
 
   const scene = gameState.scene;
   const do_gravity = (scene_list[scene].mode === "platformer");

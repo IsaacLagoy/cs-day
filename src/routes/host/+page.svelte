@@ -35,31 +35,9 @@
 <div style="display: flex; justify-content: space-around;">
 <div>
     <h3>Scene</h3>
-
     <button on:click={() => resetScene()}>Reset</button>
     <button on:click={() => decScene()}>Scene Backward</button>
     <button on:click={() => incScene()}>Scene Forward</button>
-
-    <hr>
-    <h3>Mode</h3>
-
-    <button on:click={() => setMode('none')}>Set Mode None</button>
-    <button on:click={() => setMode('fly')}>Set Mode Fly</button>
-    <button on:click={() => setMode('platformer')}>Set Mode Platformer</button>
-
-    <hr>
-    <h3>Slide</h3>
-
-    <button on:click={() => resetSlide()}>Reset</button>
-    <button on:click={() => decSlide()}>Slide Backward</button>
-    <button on:click={() => incSlide()}>Slide Forward</button>
-
-    <hr>
-    <h3>Level</h3>
-
-    <button on:click={() => resetLevel()}>Reset</button>
-    <button on:click={() => decLevel()}>Level Backward</button>
-    <button on:click={() => incLevel()}>Level Forward</button>
 </div>
 
 <div class="container">
