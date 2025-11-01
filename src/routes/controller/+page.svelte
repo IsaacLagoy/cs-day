@@ -1,6 +1,5 @@
 <script>
-  import { connect, connection, send } from '$lib/ws';
-  import { get } from 'svelte/store';
+  import { connect } from '$lib/realtime';
   import { onMount } from 'svelte';
 
   let ws;
@@ -9,12 +8,11 @@
     ws = connect('controller');
   });
 
-  function sendInput(action) {
-    send(get(connection), 'controllerInput', { action });
+  function sendInput(input) {
+    ws.send({ input }); // send as gameState object
   }
 </script>
 
 <h1>Controller</h1>
-<button on:click={() => sendInput('left')}>Left</button>
-<button on:click={() => sendInput('right')}>Right</button>
-<button on:click={() => sendInput('jump')}>Jump</button>
+<button on:click={() => sendInput({ action: 'jump' })}>Jump</button>
+<button on:click={() => sendInput({ action: 'duck' })}>Duck</button>

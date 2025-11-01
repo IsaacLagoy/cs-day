@@ -1,20 +1,19 @@
 <script>
-  import { connect, connection, send } from '$lib/ws';
-  import { get } from 'svelte/store';
+  import { connect } from '$lib/realtime';
   import { onMount } from 'svelte';
 
   let ws;
 
   onMount(() => {
     ws = connect('host');
-    });
+  });
 
   function startGame() {
-    send(get(connection), 'hostCommand', { start: true });
+    ws.send({ started: true });
   }
 
   function setFlag(name, value) {
-    send(get(connection), 'hostCommand', { [name]: value });
+    ws.send({ [name]: value });
   }
 </script>
 

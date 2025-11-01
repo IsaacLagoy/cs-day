@@ -1,21 +1,25 @@
 <script>
-  import { connect, messages } from '$lib/ws';
+  import { connect, messages } from '$lib/realtime';
   import { onMount } from 'svelte';
   import { derived } from 'svelte/store';
 
+  let ws;
   let gameState = {};
 
   onMount(() => {
-    connect('view');
+    ws = connect('view');
   });
 
-  // Listen for updates
+  // Listen only for gameUpdate messages
   const gameUpdates = derived(messages, ($m) =>
-    $m.filter((msg) => msg.type === 'gameUpdate')
+    $m.filter((msg) => msg.gameState)
   );
 
   $: if ($gameUpdates.length > 0) {
-    gameState = $gameUpdates[$gameUpdates.length - 1].gameState;
+    const lastUpdate = $gameUpdates[$gameUpdates.length - 1].gameState;
+    if (lastUpdate) {
+      gameState = { ...gameState, ...lastUpdate }; // merge incremental updates
+    }
   }
 </script>
 
