@@ -25,6 +25,8 @@ let slide_7: HTMLImageElement;
 let level_list: Array<Level | null>;
 let level_1: Level;
 let level_2: Level;
+let level_3: Level;
+let level_4: Level;
 
 // Load assets
 if (typeof window !== 'undefined') {
@@ -50,13 +52,15 @@ if (typeof window !== 'undefined') {
   let level_1_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
   level_1.add(level_1_floor);
 
-  level_2 = new Level();
-  let level_2_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
-  let level_2_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
-  level_2.add(level_2_floor_left);
-  level_2.add(level_2_floor_right);
+  level_3 = new Level();
+  let level_3_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
+  let level_3_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
+  let level_3_goal = new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff");
+  level_3.add(level_3_floor_left);
+  level_3.add(level_3_floor_right);
+  level_3.add(level_3_goal);
 
-  level_list = [level_1, level_2, null];
+  level_list = [level_1, level_3, null];
 }
 
 
