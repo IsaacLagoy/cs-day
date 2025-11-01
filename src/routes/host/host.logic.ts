@@ -5,6 +5,7 @@ import type { ButtonConfig } from '$lib/types';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
+const NUM_SCENES = 5;
 
 export class HostLogic {
   ws: WebSocketConnection | undefined;
@@ -105,7 +106,7 @@ export class HostLogic {
       console.warn('WebSocket not connected');
       return;
     }
-    this.scene++;
+    this.scene = Math.min(this.scene + 1, NUM_SCENES - 1);
     this.setFlag('scene', this.scene);
   }
 
@@ -114,7 +115,7 @@ export class HostLogic {
       console.warn('WebSocket not connected');
       return;
     }
-    this.scene--;
+    this.scene = Math.max(this.scene - 1, 0);
     this.setFlag('scene', this.scene);
   }
 
