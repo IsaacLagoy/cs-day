@@ -34,10 +34,10 @@ export class Player {
     }
 
     update(deltaTime: number) {
-        if (this.inputs["right"]) this.pos.x += this.speed * deltaTime * unit;
-        if (this.inputs["left"]) this.pos.x -= this.speed * deltaTime * unit;
-        if (this.inputs["up"]) this.pos.y += this.speed * deltaTime * unit;
-        if (this.inputs["down"]) this.pos.y -= this.speed * deltaTime * unit;
+        if (this.inputs["right"]) this.pos.x += this.speed * deltaTime;
+        if (this.inputs["left"]) this.pos.x -= this.speed * deltaTime;
+        if (this.inputs["up"]) this.pos.y += this.speed * deltaTime;
+        if (this.inputs["down"]) this.pos.y -= this.speed * deltaTime;
     }
 
     calcCollider() {
