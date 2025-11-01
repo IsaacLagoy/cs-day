@@ -63,6 +63,7 @@ let level_princess_end: Level;
 let level_14: Level;
 let level_15: Level;
 let level_16: Level;
+let level_hole: Level;
 
 let scene_list: Scene[];
 
@@ -121,6 +122,14 @@ if (typeof window !== 'undefined') {
   let level_2_goal = new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff");
   level_2.add(level_2_floor);
   level_2.add(level_2_goal);
+
+  level_hole = new Level();
+  let level_hole_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
+  let level_hole_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
+  let level_hole_goal = new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff");
+  level_hole.add(level_hole_floor_left);
+  level_hole.add(level_hole_floor_right);
+  level_hole.add(level_hole_goal);
   
   
   level_3 = new Level();
@@ -275,6 +284,7 @@ if (typeof window !== 'undefined') {
       {level: level_1, slide: QR, mode: 'platformer'},
       {level: level_2, slide: null, mode: 'platformer'},
       {level: level_2, slide: slide_9, mode: 'platformer'},
+      {level: level_hole, slide: null, mode: 'platformer'},
       {level: level_6, slide: slide_10, mode: 'platformer'},
       {level: level_3, slide: null, mode: 'platformer'},
       {level: level_7, slide: slide_11, mode: 'platformer'},
