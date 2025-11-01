@@ -9,7 +9,7 @@ import { Coin } from './coin';
 
 interface Scene {
     level: Level | null;
-    slide: HTMLImageElement;
+    slide: HTMLImageElement | null;
     mode: String;
 }
 
@@ -45,6 +45,9 @@ let level_2: Level;
 let level_3: Level;
 let level_4: Level;
 let level_5: Level;
+let level_6: Level;
+let level_7: Level;
+let level_8: Level;
 
 let scene_list: Scene[];
 
@@ -79,10 +82,10 @@ if (typeof window !== 'undefined') {
   bg_2.src = '/bg-2.png'; 
   bg_3 = new Image();
   bg_3.src = '/bg-3.png'; 
+  QR = new Image();
+  QR.src = '/QR.png'; 
 
-  slide_list = [slide_1, slide_2, slide_3, slide_4, slide_5, slide_6, slide_7, slide_8, slide_9, slide_10, slide_11, bg_1, bg_2, bg_3, null];
-
-  // // SLIDE 10
+  // SLIDE 10
   // test_level = new Level();
   // let test_level_left = new GameObject({x: -5.95, y: -1.45}, {x: 5.35, y: 4.3}, "#941a1a", false);
   // let test_level_right = new GameObject({x: 4.35, y: -1.1}, {x: 10.9, y: 8.65}, "#941a1a", false);
@@ -128,14 +131,21 @@ if (typeof window !== 'undefined') {
   level_5.add(level_5_floor_right);
   level_5.add(level_5_platform);
 
-  level_list = [level_1, level_2, level_3, level_4, level_5, null];
-
   // define scenes
   scene_list = [
         {level: null, slide: slide_1, mode: 'none'},
         {level: null, slide: slide_2, mode: 'none'},
         {level: null, slide: slide_3, mode: 'none'},
-        {level: level_1, slide: slide_3, mode: 'platformer'},
+        {level: null, slide: slide_4, mode: 'none'},
+        {level: null, slide: slide_5, mode: 'none'},
+        {level: null, slide: slide_6, mode: 'none'},
+        {level: null, slide: slide_7, mode: 'none'},
+        {level: null, slide: QR, mode: 'fly'},
+        {level: level_1, slide: QR, mode: 'platformer'},
+        {level: level_2, slide: null, mode: 'platformer'},
+        {level: level_3, slide: null, mode: 'platformer'},
+        {level: level_4, slide: null, mode: 'platformer'},
+        {level: level_5, slide: null, mode: 'platformer'},
     ]
 }
 
@@ -171,7 +181,7 @@ function update(deltaTime: number) {
   const levelChange = prev_level !== scene_list[scene].level && scene_list[scene].level !== level_1;
   prev_level = scene_list[scene].level;
 
-  const do_gravity = gameState.mode === "platformer";
+  const do_gravity = (scene_list[scene].mode === "platformer");
 
   Object.values(currentPlayers).forEach(player => {
     player.update(deltaTime, do_gravity);
