@@ -8,13 +8,14 @@ export class GameObject {
 
     collider: AABB;
 
-    constructor(position: vec2, scale: vec2={ x: 1, y: 1 }, color="#4400ffff") {
+    constructor(position: vec2, scale: vec2={ x: 10, y: 10 }, color="#4400ffff") {
         this.position = position;
-        this.scale = scale;
+        this.scale = {x: scale.x, y: scale.y};
         this.vel = { x: 0, y: 0 };
         this.color = color;
 
-        this.collider = { topRight: this.position, bottomLeft: this.position };
+        this.collider = { topRight: {x: 0, y: 0}, bottomLeft: {x: 0, y: 0} };
+        this.calcCollider();
     }
 
     draw(ctx: CanvasRenderingContext2D, width: number, height: number) {
@@ -45,5 +46,6 @@ export class GameObject {
     update(time: number) {
         this.position.x += this.vel.x * time;
         this.position.y += this.vel.y * time;
+        this.calcCollider();
     }
 }

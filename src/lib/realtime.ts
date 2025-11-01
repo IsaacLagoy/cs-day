@@ -132,10 +132,15 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
 
   // ---- Cleanup on tab close ----
   if (typeof window !== 'undefined') {
-    window.addEventListener('pagehide', () => {
-      disconnectAll();
-    });
+    const cleanup = async () => {
+      await disconnectAll();
+    };
+
+    window.addEventListener('beforeunload', cleanup);
+    window.addEventListener('pagehide', cleanup);
+    window.addEventListener('unload', cleanup);
   }
+
 
   // ---- Send helpers ----
   function send(gameStateUpdate: Record<string, any>): void {

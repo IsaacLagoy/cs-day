@@ -8,7 +8,7 @@ export class Player extends GameObject {
     inputs: Record<string, boolean>;
 
     constructor(clientId: string, role: string, position: vec2 = {x: 0, y: 0}, color='#fc4444ff', speed = 5) {
-        super(position, {x: 1, y: 1}, color);
+        super(position, {x: 10, y: 10}, color);
 
         this.clientId = clientId;
         this.role = role;

@@ -3,6 +3,7 @@ import { get } from 'svelte/store';
 import { GameViewController } from './controller';
 import { Level } from './level';
 import { GameObject } from './game_object';
+import { collide, getMTV } from './physics';
 
 
 // Game Rendering
@@ -92,7 +93,11 @@ function update(deltaTime: number, level: Level) {
 
     // collision
     Object.values(level.objects).forEach(obj => {
-
+        if (collide(player.collider, obj.collider)) {
+            // const mtv = getMTV(player.position, obj.position, player.scale, obj.scale);
+            player.position.x = 0;
+            player.position.y = 0;
+        }
     });
   });
 }
