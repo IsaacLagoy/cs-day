@@ -1,8 +1,9 @@
-<script>
+<script lang="ts">
     import { connect } from '$lib/realtime';
+    import type { WebSocketConnection } from '$lib/realtime';
     import { onMount } from 'svelte';
 
-    let ws;
+    let ws: WebSocketConnection | undefined;
 
     onMount(() => {
         if (!ws) {
@@ -10,12 +11,16 @@
         }
     });
 
-    function startGame() {
+    function startGame(): void {
+        if (ws) {
             ws.send({ started: true });
+        }
     }
 
-    function setFlag(name, value) {
+    function setFlag(name: string, value: boolean): void {
+        if (ws) {
             ws.send({ [name]: value });
+        }
     }
 </script>
 

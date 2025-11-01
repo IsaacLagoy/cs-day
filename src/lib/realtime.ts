@@ -1,27 +1,62 @@
-// src/lib/realtime.js
 import { writable } from 'svelte/store';
+import type { Writable } from 'svelte/store';
 import { createClient } from '@supabase/supabase-js';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 
-export const messages = writable([]);
-export const clientId = writable(null);
-export const connectedClients = writable([]); // all connected clients
+// Type definitions
+export interface ConnectedClient {
+  clientId: string;
+  role: string;
+}
+
+export interface BaseMessage {
+  type: string;
+  clientId: string;
+  role?: string;
+}
+
+export interface ClientJoinedMessage extends BaseMessage {
+  type: 'clientJoined';
+  role: string;
+}
+
+export interface ClientLeftMessage extends BaseMessage {
+  type: 'clientLeft';
+}
+
+export interface GameUpdateMessage extends BaseMessage {
+  type: 'gameUpdate';
+  gameState: Record<string, any>;
+}
+
+export type Message = ClientJoinedMessage | ClientLeftMessage | GameUpdateMessage;
+
+export interface WebSocketConnection {
+  send: (gameStateUpdate: Record<string, any>) => void;
+  clientId: string;
+}
+
+// Stores
+export const messages: Writable<Message[]> = writable([]);
+export const clientId: Writable<string | null> = writable(null);
+export const connectedClients: Writable<ConnectedClient[]> = writable([]);
 
 const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
 
-export function connect(role, existingId = null) {
-  const channel = supabase.channel('game');
+export function connect(role: string, existingId?: string): WebSocketConnection {
+  const channel: RealtimeChannel = supabase.channel('game');
 
-  const id = existingId || crypto.randomUUID();
+  const id: string = existingId || crypto.randomUUID();
   clientId.set(id);
 
-  // Persist if it’s new
+  // Persist if it's new
   if (!existingId && typeof window !== 'undefined') {
     localStorage.setItem('clientId', id);
   }
 
   // Broadcast join message
-  function announceJoin() {
+  function announceJoin(): void {
     channel.send({
       type: 'broadcast',
       event: 'message',
@@ -30,7 +65,7 @@ export function connect(role, existingId = null) {
   }
 
   // Broadcast leave on unload
-  function announceLeave() {
+  function announceLeave(): void {
     channel.send({
       type: 'broadcast',
       event: 'message',
@@ -39,8 +74,8 @@ export function connect(role, existingId = null) {
   }
 
   // Listen for messages
-  channel.on('broadcast', { event: 'message' }, (payload) => {
-    const msg = payload.payload;
+  channel.on('broadcast', { event: 'message' }, (payload: { payload: Message }) => {
+    const msg: Message = payload.payload;
 
     console.log('Received broadcast:', msg); // debug log
 
@@ -64,7 +99,7 @@ export function connect(role, existingId = null) {
     }
   });
 
-  channel.subscribe((status) => {
+  channel.subscribe((status: string) => {
     console.log('Supabase channel status:', status);
     if (status === 'SUBSCRIBED') {
       console.log(`Connected to Supabase Realtime as ${role}`);
@@ -76,7 +111,7 @@ export function connect(role, existingId = null) {
     window.addEventListener('beforeunload', () => announceLeave());
   }
 
-  function send(gameStateUpdate) {
+  function send(gameStateUpdate: Record<string, any>): void {
     channel.send({
       type: 'broadcast',
       event: 'message',

@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
   import { connect, messages, connectedClients, clientId } from '$lib/realtime';
+  import type { WebSocketConnection, GameUpdateMessage } from '$lib/realtime';
   import { onMount } from 'svelte';
   import { derived } from 'svelte/store';
 
-  let ws;
-  let gameState = {};
+  let ws: WebSocketConnection | undefined;
+  let gameState: Record<string, any> = {};
 
   onMount(() => {
     if (!ws) {
@@ -14,7 +15,7 @@
 
   // Listen for game updates
   const gameUpdates = derived(messages, ($m) =>
-    $m.filter((msg) => msg.type === 'gameUpdate')
+    $m.filter((msg): msg is GameUpdateMessage => msg.type === 'gameUpdate')
   );
 
   $: if ($gameUpdates.length > 0) {
