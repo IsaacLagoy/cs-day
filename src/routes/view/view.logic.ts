@@ -66,7 +66,7 @@ function draw() {
   const currentPlayers = get(controllerInstance.players);
 
   Object.values(currentPlayers).forEach(player => {
-    player.draw(ctx);
+    player.draw(ctx, canvas.width, canvas.height);
   });
 }
 
