@@ -47,7 +47,7 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
         localStorage.setItem('clientId', id);
     }
 
-    const channel: RealtimeChannel = supabase.channel(`game-${id}`, {
+    const channel: RealtimeChannel = supabase.channel('game', {
         config: {
             presence: {
                 key: id,
