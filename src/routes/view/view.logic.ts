@@ -4,6 +4,7 @@ import { GameViewController } from './controller';
 import { Level } from './level';
 import { GameObject } from './game_object';
 import { collide, getMTV } from './physics';
+import { MovingPlatform } from './moving_platform';
 
 
 // Game Rendering
@@ -27,6 +28,7 @@ let level_1: Level;
 let level_2: Level;
 let level_3: Level;
 let level_4: Level;
+let level_5: Level;
 
 // Load assets
 if (typeof window !== 'undefined') {
@@ -66,7 +68,23 @@ if (typeof window !== 'undefined') {
   level_3.add(level_3_floor_right);
   level_3.add(level_3_goal);
 
-  level_list = [level_1, level_2, level_3, null];
+  level_4 = new Level();
+  let level_4_floor_left = new GameObject({x: -7, y: -5}, {x: 6, y: 2}, "#dfdfdfff");
+  let level_4_floor_mid = new GameObject({x: 0, y: -4}, {x: 2, y: 4}, "#dfdfdfff");
+  let level_4_floor_right = new GameObject({x: 7, y: -3}, {x: 6, y: 6}, "#dfdfdfff");
+  level_4.add(level_4_floor_left);
+  level_4.add(level_4_floor_mid);
+  level_4.add(level_4_floor_right);
+
+  level_5 = new Level();
+  let level_5_floor_left = new GameObject({x: -7, y: -5}, {x: 6, y: 2}, "#dfdfdfff");
+  let level_5_platform = new MovingPlatform({x: 0, y: -4.25}, {x: 0, y: -.25}, 5, {x: 2, y: 0.5}, "#dfdfdfff");
+  let level_5_floor_right = new GameObject({x: 7, y: -3}, {x: 6, y: 6}, "#dfdfdfff");
+  level_5.add(level_5_floor_left);
+  level_5.add(level_5_floor_right);
+  level_5.add(level_5_platform);
+
+  level_list = [level_1, level_2, level_3, level_4, level_5, null];
 }
 
 
@@ -106,7 +124,7 @@ function update(deltaTime: number, level: Level) {
         return;
     }
 
-    level_list[level].update();
+    level_list[level].update(deltaTime);
 
     // collision
     Object.values(level_list[level]?.objects).forEach(obj => {
