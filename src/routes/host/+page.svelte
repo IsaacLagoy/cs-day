@@ -1,120 +1,194 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
     import { HostLogic } from './host.logic';
+    import { joinQrDataUrl, joinUrl, pollSession } from '$lib/join';
 
     const host = new HostLogic();
     const { buttonConfig } = host;
+    let stopPoll: (() => void) | undefined;
 
     onMount(() => {
         host.connect();
+        stopPoll = pollSession();
     });
 
     onDestroy(() => {
+        stopPoll?.();
         host.destroy();
     });
-
-    function setMode(mode: string): void { host.setMode(mode); }
-
-    function resetLevel(): void { host.resetLevel(); }
-    function incLevel(): void { host.incLevel(); }
-    function decLevel(): void { host.decLevel(); }
-
-    function resetSlide(): void { host.resetSlide(); }
-    function incSlide(): void { host.incSlide(); }
-    function decSlide(): void { host.decSlide(); }
-
-    function resetScene(): void { host.resetScene(); }
-    function incScene(): void { host.incScene(); }
-    function decScene(): void { host.decScene(); }
 
     function toggleButton(buttonName: string) { host.toggleButton(buttonName); }
 </script>
 
-<h1>Host Controls</h1>
+<div class="page">
+    <h1>Host</h1>
 
-<div style="display: flex; justify-content: space-around;">
-<div>
-    <h3>Scene</h3>
-    <button on:click={() => resetScene()}>Reset</button>
-    <button on:click={() => decScene()}>Scene Backward</button>
-    <button on:click={() => incScene()}>Scene Forward</button>
-</div>
+    <div class="join">
+        {#if $joinQrDataUrl}
+            <img class="qr" src={$joinQrDataUrl} alt="Join QR code" width="220" height="220" />
+        {:else}
+            <p class="hint">Waiting for join URL…</p>
+        {/if}
+        {#if $joinUrl}
+            <p class="join-url">{$joinUrl}</p>
+        {/if}
+    </div>
 
-<div class="container">
-    <div class="section">
-        <h2>Button Configuration</h2>
-        <p>Toggle buttons on/off for all controllers:</p>
-        <div class="button-controls">
-            {#each $buttonConfig as button}
-                <div class="button-toggle">
-                    <span style="font-size: 16px; text-transform: capitalize;">
-                        {button.name}
-                    </span>
-                    <button 
-                        class="toggle-btn {button.enabled ? 'enabled' : 'disabled'}"
+    <div class="panels">
+        <section class="panel">
+            <h2>Scene</h2>
+            <div class="scene-row">
+                <button class="button" type="button" on:click={() => host.decScene()}>◀</button>
+                <button class="button" type="button" on:click={() => host.resetScene()}>Reset</button>
+                <button class="button" type="button" on:click={() => host.incScene()}>▶</button>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Controller buttons</h2>
+            <p class="hint">Toggle what players can press</p>
+            <div class="toggles">
+                {#each $buttonConfig as button}
+                    <button
+                        type="button"
+                        class="toggle {button.enabled ? 'pressed' : ''}"
                         on:click={() => toggleButton(button.name)}
                     >
-                        {button.enabled ? 'Enabled' : 'Disabled'}
+                        <span class="toggle-name">{button.name}</span>
+                        <span>{button.enabled ? 'On' : 'Off'}</span>
                     </button>
-                </div>
-            {/each}
-        </div>
+                {/each}
+            </div>
+        </section>
     </div>
 </div>
-</div>
-
 
 <style>
-    .container {
-        padding: 20px;
-        max-width: 600px;
+    .page {
+        min-height: 100%;
+        box-sizing: border-box;
+        padding: 24px 18px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        background: #111;
+        color: #eee;
+        font-family: system-ui, sans-serif;
+        user-select: none;
     }
 
-    .section {
-        margin-bottom: 30px;
-        padding: 15px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
+    h1 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
     }
 
-    .button-controls {
+    h2 {
+        margin: 0 0 10px;
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+
+    .join {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        max-width: 520px;
+        width: 100%;
+    }
+
+    .qr {
+        width: 220px;
+        height: 220px;
+        border-radius: 14px;
+        border: 3px solid #333;
+        background: #fff;
+    }
+
+    .join-url {
+        margin: 0;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.8rem;
+        word-break: break-all;
+        text-align: center;
+        color: #ccc;
+    }
+
+    .hint {
+        margin: 0 0 12px;
+        font-size: 0.8rem;
+        color: #999;
+    }
+
+    .panels {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 28px;
+        width: 100%;
+        max-width: 920px;
+    }
+
+    .panel {
+        flex: 1 1 280px;
+        max-width: 400px;
+    }
+
+    .scene-row {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .button,
+    .toggle {
+        border-radius: 14px;
+        border: 3px solid #333;
+        background: #f0f0f0;
+        color: #111;
+        font-weight: 700;
+        cursor: pointer;
+        user-select: none;
+        transition: transform 0.08s ease, background 0.08s ease;
+    }
+
+    .button {
+        min-width: 84px;
+        height: 64px;
+        padding: 0 16px;
+        font-size: 18px;
+    }
+
+    .button:active,
+    .toggle:active {
+        transform: scale(0.96);
+        background: #d0d0d0;
+    }
+
+    .toggles {
         display: flex;
         flex-direction: column;
         gap: 10px;
     }
 
-    .button-toggle {
+    .toggle {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 10px;
-        background: #f5f5f5;
-        border-radius: 5px;
+        padding: 12px 16px;
+        font-size: 16px;
+        text-transform: capitalize;
     }
 
-    .toggle-btn {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background-color 0.2s;
-    }
-
-    .toggle-btn.enabled {
-        background-color: #4CAF50;
-        color: white;
-    }
-
-    .toggle-btn.disabled {
-        background-color: #f44336;
-        color: white;
-    }
-
-    .game-controls button {
-        margin-right: 10px;
-        padding: 10px 20px;
+    .toggle-name {
         font-size: 16px;
     }
-</style>
 
+    .pressed {
+        background: #4CAF50 !important;
+        color: white !important;
+        border-color: #45a049 !important;
+    }
+</style>

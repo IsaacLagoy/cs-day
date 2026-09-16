@@ -1,60 +1,42 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { connectedClients, clientId } from '$lib/realtime';
   import { GameViewController } from './controller';
-  import { init } from './view.logic';
+  import { init, setJoinQr } from './view.logic';
+  import { joinQrDataUrl, pollSession } from '$lib/join';
 
   const controller = new GameViewController();
-  const { gameState, players } = controller;
-
   let canvas: HTMLCanvasElement;
-  let ctx: CanvasRenderingContext2D;
+  let stopPoll: (() => void) | undefined;
+  let unsubQr: (() => void) | undefined;
 
   onMount(() => {
     controller.connect();
     init(canvas, controller);
-
+    stopPoll = pollSession();
+    unsubQr = joinQrDataUrl.subscribe((url) => {
+      if (url) setJoinQr(url);
+    });
   });
 
   onDestroy(() => {
+    stopPoll?.();
+    unsubQr?.();
     controller.destroy();
   });
 </script>
 
+<canvas bind:this={canvas}></canvas>
+
 <style>
+  :global(html),
+  :global(body) {
+    overflow: hidden;
+    background: #111;
+  }
+
   canvas {
     display: block;
     width: 100%;
     height: 100%;
   }
 </style>
-
-<canvas bind:this={canvas}></canvas>
-
-<h1>Game View</h1>
-
-<h2>Game State</h2>
-<pre>{JSON.stringify($gameState, null, 2)}</pre>
-
-<h2>Players</h2>
-{#each Object.values($players) as player}
-  <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px; z-index: 15;">
-    <h3>Player: {player.clientId.slice(0, 8)}... {player.clientId === $clientId ? '(You)' : ''}</h3>
-    <p>Position: ({player.position.x.toFixed(0)}, {player.position.y.toFixed(0)})</p>
-    <p>Inputs:</p>
-    <ul>
-      {#each Object.entries(player.inputs) as [button, pressed]}
-        <li>{button}: {pressed ? '✓ Pressed' : '○ Released'}</li>
-      {/each}
-    </ul>
-  </div>
-{/each}
-
-<h2>Connected Clients</h2>
-<ul>
-  {#each $connectedClients as client}
-    <li>
-      {client.clientId.slice(0, 8)}... ({client.role}) {client.clientId === $clientId ? '← You' : ''}
-    </li>
-  {/each}
-</ul>

@@ -11,6 +11,7 @@ interface Scene {
     level: Level | null;
     slide: HTMLImageElement | null;
     mode: String;
+    showQr?: boolean;
 }
 
 // Game Rendering
@@ -20,7 +21,7 @@ let controllerInstance: GameViewController;
 let lastTime = 0;
 
 let slide_list: Array<HTMLImageElement | null>;
-let QR: HTMLImageElement;
+let joinQrImage: HTMLImageElement | null = null;
 let slide_1: HTMLImageElement;
 let slide_2: HTMLImageElement;
 let slide_2_1: HTMLImageElement;
@@ -116,8 +117,6 @@ if (typeof window !== 'undefined') {
   bg_2.src = '/bg-2.png'; 
   bg_3 = new Image();
   bg_3.src = '/bg-3.png'; 
-  QR = new Image();
-  QR.src = '/QR.png'; 
 
   princess_1 = new Image();
   princess_1.src = '/princess-start.png'; 
@@ -263,7 +262,7 @@ if (typeof window !== 'undefined') {
   level_15.add(new GameObject({x: 3, y: -7}, {x: 2, y: 4}, "#dfdfdfff"));  
   level_15.add(new GameObject({x: 8.5, y: -5}, {x: 4, y: 6}, "#dfdfdfff"));
   level_15.add(new GameObject({x: 1.5, y: 0.5}, {x: 4, y: 0.5}, "#dfdfdfff"));
-  level_15.add(new GameObject({x: 8.5, y: 3}, {x: 4, y: 1}, "#dfdfdfff"));
+  level_15.add(new GameObject({x: 8.5, y: 3}, {x: 4, y: 1}, "#72e56cff"));
 
   // Narative Levels
   level_14 = new Level();
@@ -295,8 +294,8 @@ if (typeof window !== 'undefined') {
       {level: null, slide: slide_5, mode: 'none'},
       {level: null, slide: slide_6, mode: 'none'},
       {level: null, slide: slide_7, mode: 'none'},
-      {level: null, slide: QR, mode: 'fly'},
-      {level: level_1, slide: QR, mode: 'platformer'},
+      {level: null, slide: slide_8, mode: 'fly', showQr: true},
+      {level: level_1, slide: slide_8, mode: 'platformer', showQr: true},
       {level: level_2, slide: null, mode: 'platformer'},
       {level: level_2, slide: slide_9, mode: 'platformer'},
       {level: level_hole, slide: null, mode: 'platformer'},
@@ -382,8 +381,10 @@ function update(deltaTime: number) {
               const mtv = getMTV(player.collider, obj.collider, player.vel);
               player.position.x += mtv.x;
               player.position.y += mtv.y;
+              player.calcCollider();
 
-              if (mtv.x === 0) {
+              // Only landing on a surface restores jump, not ceiling or wall hits
+              if (mtv.y > 0) {
                   player.canJump = true;
               }
             }
@@ -403,41 +404,58 @@ function draw() {
 
   if (scene_list[scene].slide) drawBackground(scene_list[scene].slide);
 
-  if (scene_list[scene].mode === 'none') return;
+  if (scene_list[scene].mode !== 'none') {
+    if (scene_list[scene].level) scene_list[scene].level.draw(ctx, canvas.width, canvas.height);
 
-  if (scene_list[scene].level) scene_list[scene].level.draw(ctx, canvas.width, canvas.height);
+    const currentPlayers = get(controllerInstance.players);
 
-  const currentPlayers = get(controllerInstance.players);
+    Object.values(currentPlayers).forEach(player => {
+      player.draw(ctx, canvas.width, canvas.height);
+    });
+  }
 
-  Object.values(currentPlayers).forEach(player => {
-    player.draw(ctx, canvas.width, canvas.height);
-  });
+  if (scene_list[scene].showQr) drawJoinQr();
 }
 
-function drawBackground(image: HTMLImageElement) {
+export function setJoinQr(dataUrl: string): void {
+  const img = new Image();
+  img.src = dataUrl;
+  joinQrImage = img;
+}
+
+function slideDrawRect(): { offsetX: number; offsetY: number; drawWidth: number; drawHeight: number } {
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
-
   const imageAspect = 2560 / 1440;
   const canvasAspect = canvasWidth / canvasHeight;
 
-  let drawWidth, drawHeight, offsetX, offsetY;
-
   if (canvasAspect > imageAspect) {
-    // Canvas is wider than image → height matches, width scaled
-    drawHeight = canvasHeight;
-    drawWidth = canvasHeight * imageAspect;
-    offsetX = (canvasWidth - drawWidth) / 2;
-    offsetY = 0;
-  } else {
-    // Canvas is taller → width matches, height scaled
-    drawWidth = canvasWidth;
-    drawHeight = canvasWidth / imageAspect;
-    offsetX = 0;
-    offsetY = (canvasHeight - drawHeight) / 2;
+    const drawHeight = canvasHeight;
+    const drawWidth = canvasHeight * imageAspect;
+    return { offsetX: (canvasWidth - drawWidth) / 2, offsetY: 0, drawWidth, drawHeight };
   }
 
+  const drawWidth = canvasWidth;
+  const drawHeight = canvasWidth / imageAspect;
+  return { offsetX: 0, offsetY: (canvasHeight - drawHeight) / 2, drawWidth, drawHeight };
+}
+
+function drawBackground(image: HTMLImageElement) {
+  const { offsetX, offsetY, drawWidth, drawHeight } = slideDrawRect();
   ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+}
+
+function drawJoinQr(): void {
+  if (!joinQrImage || !joinQrImage.complete || joinQrImage.naturalWidth === 0) return;
+
+  const size = canvas.height * 0.5;
+  const x = (canvas.width - size) / 2;
+  const y = (canvas.height - size) / 2;
+  const inset = size * 0.04;
+
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(x, y, size, size);
+  ctx.drawImage(joinQrImage, x + inset, y + inset, size - inset * 2, size - inset * 2);
 }
 
 const level = new Level();

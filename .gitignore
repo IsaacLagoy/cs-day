@@ -1,4 +1,6 @@
 node_modules
+bin/cloudflared
+bin/cloudflared.exe
 
 # Output
 .output

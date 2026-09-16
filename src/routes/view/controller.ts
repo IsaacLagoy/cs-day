@@ -102,6 +102,9 @@ export class GameViewController {
   }
 
   destroy(): void {
-    // Cleanup if needed
+    if (this.ws) {
+      void this.ws.disconnect();
+      this.ws = undefined;
+    }
   }
 }

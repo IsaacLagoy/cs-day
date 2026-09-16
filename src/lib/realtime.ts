@@ -1,10 +1,6 @@
-// src/lib/realtime.ts
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { createClient } from '@supabase/supabase-js';
-import type { RealtimeChannel } from '@supabase/supabase-js';
-import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
-import type { ConnectedClient, ButtonConfig, Message } from '$lib/types';
+import type { ButtonConfig, ConnectedClient, Message } from '$lib/types';
 
 export interface WebSocketConnection {
   send: (gameStateUpdate: Record<string, any>) => void;
@@ -15,190 +11,173 @@ export interface WebSocketConnection {
   disconnect: () => Promise<void>;
 }
 
-// Stores
 export const messages: Writable<Message[]> = writable([]);
 export const clientId: Writable<string | null> = writable(null);
 export const connectedClients: Writable<ConnectedClient[]> = writable([]);
 
-// Periodically clean up old messages to prevent memory bloat
+const HEARTBEAT_MS = 20_000;
+const RECONNECT_MS = 750;
+
+type ActiveConn = {
+  ws: WebSocket;
+  id: string;
+  role: string;
+  intentional: boolean;
+};
+
+const active = new Map<string, ActiveConn>();
+
 if (typeof window !== 'undefined') {
   setInterval(() => {
-    messages.update(msgs => {
-      if (msgs.length > 100) {
-        console.log('[Realtime] Cleaning message store, had', msgs.length, 'messages');
-        // Keep only the last 50 messages
-        return msgs.slice(-50);
-      }
-      return msgs;
-    });
-  }, 30000); // Every 30 seconds
+    messages.update((msgs) => (msgs.length > 100 ? msgs.slice(-50) : msgs));
+  }, 30_000);
 }
 
-// Single shared Supabase client
-const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
+function wsUrl(): string {
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${proto}//${location.host}/ws`;
+}
 
-// Track active realtime channels
-const activeChannels = new Map<string, RealtimeChannel>();
+function pushMessage(msg: Message): void {
+  messages.update((m) => [...m, msg]);
+}
 
-// Completely remove all realtime channels and force socket close
 export async function disconnectAll(): Promise<void> {
-  try {
-    console.log('[Realtime] Disconnecting all channels');
-    await supabase.removeAllChannels();
-
-    // Force close the underlying realtime websocket (safe internal call)
-    const rt: any = (supabase as any).realtime;
-    if (rt && typeof rt.disconnect === 'function') {
-      await rt.disconnect();
+  for (const conn of active.values()) {
+    conn.intentional = true;
+    try {
+      conn.ws.close();
+    } catch {
+      /* ignore */
     }
-  } catch (err) {
-    console.warn('Error cleaning up Supabase connections:', err);
   }
+  active.clear();
 }
 
-// Primary connect function
 export function connect(role: string, existingId?: string): WebSocketConnection {
   const id: string = existingId || crypto.randomUUID();
-
-  // Clean up any existing channel with same id
-  if (activeChannels.has(id)) {
-    console.log('[Realtime] Cleaning up existing connection for', id);
-    const oldChannel = activeChannels.get(id);
-    oldChannel?.unsubscribe();
-    activeChannels.delete(id);
-  }
-
   clientId.set(id);
 
-  // Persist ID for reconnects
-  if (!existingId && typeof window !== 'undefined') {
+  if (typeof window !== 'undefined') {
     localStorage.setItem('clientId', id);
   }
 
-  const channel: RealtimeChannel = supabase.channel('game', {
-    config: { presence: { key: id } },
-  });
-
-  activeChannels.set(id, channel);
-
-  // ---- Presence handling ----
-  channel.on('presence', { event: 'sync' }, () => {
-    const state = channel.presenceState();
-    const clients: ConnectedClient[] = [];
-    for (const [presenceId, presences] of Object.entries(state)) {
-      const presence = presences[0] as any;
-      if (presence) {
-        clients.push({ clientId: presence.clientId, role: presence.role });
-      }
-    }
-    console.log('[Realtime] Connected clients:', clients);
-    connectedClients.set(clients);
-  });
-
-  channel.on('presence', { event: 'join' }, ({ newPresences }) => {
-    console.log('[Realtime] Client joined:', newPresences);
-  });
-
-  channel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
-    console.log('[Realtime] Client left:', leftPresences);
-  });
-
-  // ---- Broadcast handling ----
-  channel.on('broadcast', { event: 'message' }, (payload: { payload: Message }) => {
-    const msg: Message = payload.payload;
-    console.log('[Realtime] Received message:', msg.type, msg);
-    messages.update((m) => [...m, msg]);
-    
-    if (msg.type === 'buttonConfigRequest' && role === 'host') {
-      console.log('[Realtime] ⚠️ Button config request from', msg.clientId, '- Host should respond!');
-    }
-    
-    if (msg.type === 'buttonConfig') {
-      console.log('[Realtime] 🎮 Button config received:', msg);
-    }
-  });
-
-  // ---- Subscribe and track presence ----
-  let isSubscribed = false;
-  channel.subscribe(async (status: string) => {
-    console.log('[Realtime] Subscription status:', status);
-    if (status === 'SUBSCRIBED' && !isSubscribed) {
-      isSubscribed = true;
-      console.log(`[Realtime] ✅ Connected as ${role} with ID ${id}`);
-      await channel.track({
-        clientId: id,
-        role,
-        online_at: new Date().toISOString(),
-      });
-    }
-  });
-
-  // ---- Safe disconnect ----
-  let isDisconnecting = false;
-
-  async function disconnect(): Promise<void> {
-    if (isDisconnecting) return;
-    isDisconnecting = true;
-
-    console.log('[Realtime] Disconnecting client', id);
+  const prev = active.get(id);
+  if (prev) {
+    prev.intentional = true;
     try {
-      await Promise.allSettled([channel.untrack(), channel.unsubscribe()]);
-    } finally {
-      activeChannels.delete(id);
-      if (activeChannels.size === 0) {
-        await disconnectAll();
-      }
-      isDisconnecting = false;
+      prev.ws.close();
+    } catch {
+      /* ignore */
     }
+    active.delete(id);
   }
 
-  // ---- Cleanup on tab close ----
-  if (typeof window !== 'undefined') {
-    const cleanup = async () => {
-      await disconnectAll();
-    };
+  let socket: WebSocket | null = null;
+  let heartbeat: ReturnType<typeof setInterval> | undefined;
+  let reconnectTimer: ReturnType<typeof setTimeout> | undefined;
+  let closed = false;
 
+  const stopHeartbeat = () => {
+    if (heartbeat) {
+      clearInterval(heartbeat);
+      heartbeat = undefined;
+    }
+  };
+
+  const sendRaw = (payload: unknown) => {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.send(JSON.stringify(payload));
+    }
+  };
+
+  const open = () => {
+    if (closed) return;
+    stopHeartbeat();
+    socket = new WebSocket(wsUrl());
+    const conn: ActiveConn = { ws: socket, id, role, intentional: false };
+    active.set(id, conn);
+
+    socket.addEventListener('open', () => {
+      console.log(`[Realtime] Connected as ${role} with ID ${id}`);
+      sendRaw({ type: 'hello', clientId: id, role });
+      stopHeartbeat();
+      heartbeat = setInterval(() => sendRaw({ type: 'ping' }), HEARTBEAT_MS);
+    });
+
+    socket.addEventListener('message', (event) => {
+      let msg: { type?: string; clients?: ConnectedClient[] };
+      try {
+        msg = JSON.parse(String(event.data));
+      } catch {
+        return;
+      }
+      if (!msg || typeof msg.type !== 'string') return;
+      if (msg.type === 'pong' || msg.type === 'welcome') return;
+      if (msg.type === 'presence' && Array.isArray(msg.clients)) {
+        connectedClients.set(msg.clients);
+        return;
+      }
+      console.log('[Realtime] Received message:', msg.type, msg);
+      pushMessage(msg as Message);
+    });
+
+    socket.addEventListener('close', () => {
+      stopHeartbeat();
+      if (active.get(id)?.ws === conn.ws) {
+        active.delete(id);
+      }
+      if (closed || conn.intentional) return;
+      console.warn('[Realtime] Socket closed, reconnecting…');
+      reconnectTimer = setTimeout(open, RECONNECT_MS);
+    });
+
+    socket.addEventListener('error', () => {
+      /* close handler reconnects */
+    });
+  };
+
+  open();
+
+  if (typeof window !== 'undefined') {
+    const cleanup = () => {
+      closed = true;
+      void disconnectAll();
+    };
     window.addEventListener('beforeunload', cleanup);
     window.addEventListener('pagehide', cleanup);
-    window.addEventListener('unload', cleanup);
   }
 
+  async function disconnect(): Promise<void> {
+    closed = true;
+    if (reconnectTimer) clearTimeout(reconnectTimer);
+    stopHeartbeat();
+    const conn = active.get(id);
+    if (conn) {
+      conn.intentional = true;
+      try {
+        conn.ws.close();
+      } catch {
+        /* ignore */
+      }
+      active.delete(id);
+    }
+  }
 
-  // ---- Send helpers ----
   function send(gameStateUpdate: Record<string, any>): void {
-    console.log('[Realtime] Sending game update:', gameStateUpdate);
-    channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: { type: 'gameUpdate', clientId: id, role, gameState: gameStateUpdate },
-    });
+    sendRaw({ type: 'gameUpdate', clientId: id, role, gameState: gameStateUpdate });
   }
 
   function sendInput(button: string, pressed: boolean): void {
-    console.log('[Realtime] Sending input:', button, pressed);
-    channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: { type: 'playerInput', clientId: id, role, input: { button, pressed } },
-    });
+    sendRaw({ type: 'playerInput', clientId: id, role, input: { button, pressed } });
   }
 
   function sendButtonConfig(buttons: ButtonConfig[]): void {
-    console.log('[Realtime] 📤 Sending button config:', buttons);
-    channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: { type: 'buttonConfig', clientId: id, role, buttons },
-    });
+    sendRaw({ type: 'buttonConfig', clientId: id, role, buttons });
   }
 
   function requestButtonConfig(): void {
-    console.log('[Realtime] 📥 Requesting button config from host');
-    channel.send({
-      type: 'broadcast',
-      event: 'message',
-      payload: { type: 'buttonConfigRequest', clientId: id, role },
-    });
+    sendRaw({ type: 'buttonConfigRequest', clientId: id, role });
   }
 
   return { send, sendInput, sendButtonConfig, requestButtonConfig, clientId: id, disconnect };

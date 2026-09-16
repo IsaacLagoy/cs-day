@@ -51,11 +51,17 @@ export interface ButtonConfigRequestMessage {
     role: string;
 }
 
-export type Message = 
-    | GameUpdateMessage 
-    | PlayerInputMessage 
-    | ButtonConfigMessage 
-    | ButtonConfigRequestMessage;
+export interface PresenceMessage {
+    type: 'presence';
+    clients: ConnectedClient[];
+}
+
+export type Message =
+    | GameUpdateMessage
+    | PlayerInputMessage
+    | ButtonConfigMessage
+    | ButtonConfigRequestMessage
+    | PresenceMessage;
 
 /* Physics */
 export interface vec2 {
