@@ -76,16 +76,8 @@ let scene_list: Scene[];
 if (typeof window !== 'undefined') {
   slide_1 = new Image();
   slide_1.src = '/slide-1.png'; 
-  // slide_2 = new Image();
-  // slide_2.src = '/slide-2.png'; 
-  slide_2_1 = new Image();
-  slide_2_1.src = '/slide-2_1.png'; 
-  slide_2_2 = new Image();
-  slide_2_2.src = '/slide-2_2.png'; 
-  slide_2_3 = new Image();
-  slide_2_3.src = '/slide-2_3.png'; 
-  slide_2_4 = new Image();
-  slide_2_4.src = '/slide-2_4.png'; 
+  slide_2 = new Image();
+  slide_2.src = '/slide-2.png'; 
   slide_3 = new Image();
   slide_3.src = '/slide-3.png'; 
   slide_4 = new Image();
@@ -243,9 +235,11 @@ if (typeof window !== 'undefined') {
   let level_13_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
   let level_13_floor_right = new GameObject({x: 6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
   let level_13_coin = new Coin({x: 0, y: 0});
+  let level_13_coin_2 = new Coin({x: 9, y: 1});
   level_13.add(level_13_floor_left);
   level_13.add(level_13_floor_right);
   level_13.add(level_13_coin);
+  level_13.add(level_13_coin_2);
 
   level_princess_start = new Level();
   level_princess_start.add(new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#926b45ff"));
@@ -285,10 +279,7 @@ if (typeof window !== 'undefined') {
   // define scenes
   scene_list = [
       {level: null, slide: slide_1, mode: 'none'},
-      {level: null, slide: slide_2_1, mode: 'none'},
-      {level: null, slide: slide_2_2, mode: 'none'},
-      {level: null, slide: slide_2_3, mode: 'none'},
-      {level: null, slide: slide_2_4, mode: 'none'},
+      {level: null, slide: slide_2, mode: 'none'},
       {level: null, slide: slide_3, mode: 'none'},
       {level: null, slide: slide_4, mode: 'none'},
       {level: null, slide: slide_5, mode: 'none'},
