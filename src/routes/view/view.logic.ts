@@ -6,7 +6,7 @@ import { GameObject } from './game_object';
 import { collide, getMTV } from './physics';
 import { MovingPlatform } from './moving_platform';
 import { Coin } from './coin';
-import { drawChicken, drawFlag, isGoal } from './sprites';
+import { drawChicken, drawCloudPlatform, drawFlag, isGoal } from './sprites';
 
 type SceneStyle = 'default' | 'chicken';
 
@@ -382,12 +382,16 @@ function draw() {
     const level = scene_list[scene].level;
 
     if (level) {
-      level.draw(ctx, canvas.width, canvas.height);
-
       if (chickenStyle) {
+        level.objects.forEach(obj => {
+          if (obj instanceof MovingPlatform) drawCloudPlatform(ctx, obj, canvas.width, canvas.height);
+          else obj.draw(ctx, canvas.width, canvas.height);
+        });
         level.objects.forEach(obj => {
           if (isGoal(obj)) drawFlag(ctx, obj, canvas.width, canvas.height, lastTime * 0.001);
         });
+      } else {
+        level.draw(ctx, canvas.width, canvas.height);
       }
     }
 

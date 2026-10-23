@@ -20,6 +20,7 @@ const GOAL_COLOR = '#72e56c';
 
 let chickenSheet: HTMLImageElement | null = null;
 let flagSheet: HTMLImageElement | null = null;
+let cloudPlatform: HTMLImageElement | null = null;
 const tintCache = new Map<string, HTMLCanvasElement>();
 
 if (typeof window !== 'undefined') {
@@ -27,6 +28,8 @@ if (typeof window !== 'undefined') {
     chickenSheet.src = '/assets/chicken.png';
     flagSheet = new Image();
     flagSheet.src = '/assets/flag.png';
+    cloudPlatform = new Image();
+    cloudPlatform.src = '/assets/cloud_platform.png';
 }
 
 function ready(img: HTMLImageElement | null): img is HTMLImageElement {
@@ -113,5 +116,20 @@ export function drawFlag(ctx: CanvasRenderingContext2D, goal: GameObject, width:
         frame * FRAME, 0, FRAME, FRAME,
         rect.x + rect.w / 2 - size / 2, rect.y - size, size, size
     );
+    ctx.restore();
+}
+
+
+// Cloud sprite stretched over a moving platform's hitbox (falls back to the plain box)
+export function drawCloudPlatform(ctx: CanvasRenderingContext2D, platform: GameObject, width: number, height: number) {
+    if (!ready(cloudPlatform)) {
+        platform.draw(ctx, width, height);
+        return;
+    }
+
+    const rect = platform.screenRect(width, height);
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(cloudPlatform, rect.x, rect.y, rect.w, rect.h);
     ctx.restore();
 }
