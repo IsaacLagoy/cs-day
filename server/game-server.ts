@@ -18,9 +18,7 @@ const attachedServers = new WeakSet<Server>();
 let lastButtonConfig: ButtonConfig[] = [
 	{ name: 'left', enabled: true },
 	{ name: 'right', enabled: true },
-	{ name: 'jump', enabled: false },
-	{ name: 'a', enabled: false },
-	{ name: 'b', enabled: false }
+	{ name: 'jump', enabled: false }
 ];
 
 function requestOrigin(req: IncomingMessage): string | null {

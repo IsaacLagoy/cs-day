@@ -5,7 +5,7 @@ import { connect, messages } from '$lib/realtime';
 import type { WebSocketConnection } from '$lib/realtime';
 import type { ButtonConfig, ButtonConfigMessage } from '$lib/types';
 
-export type ButtonName = 'jump' | 'left' | 'right' | 'a' | 'b';
+export type ButtonName = 'jump' | 'left' | 'right';
 
 export class ControllerLogic {
   ws: WebSocketConnection | undefined;
@@ -18,18 +18,14 @@ export class ControllerLogic {
     this.buttonStates = writable({
       jump: false,
       left: false,
-      right: false,
-      a: false,
-      b: false
+      right: false
     });
 
     // Initialize with all buttons enabled by default
     this.buttonConfig = writable([
       { name: 'left', enabled: true },
       { name: 'right', enabled: true },
-      { name: 'jump', enabled: false },
-      { name: 'a', enabled: false },
-      { name: 'b', enabled: false }
+      { name: 'jump', enabled: false }
     ]);
   }
 
@@ -62,14 +58,14 @@ export class ControllerLogic {
           if (configMessages.length > 0) {
             // Use the most recent config message
             const latestConfig = configMessages[configMessages.length - 1];
-            console.log('[ControllerLogic] 🎮 Applying NEW button config:', latestConfig.buttons);
+            console.log('[ControllerLogic] Applying NEW button config:', latestConfig.buttons);
             this.buttonConfig.set(latestConfig.buttons);
             
             // Verify the store was updated
             let currentConfig: ButtonConfig[] = [];
             const unsub = this.buttonConfig.subscribe(c => { currentConfig = c; });
             unsub();
-            console.log('[ControllerLogic] ✅ Button config now:', currentConfig);
+            console.log('[ControllerLogic] Button config now:', currentConfig);
           }
           
           // Update the last processed count

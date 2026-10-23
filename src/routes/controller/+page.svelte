@@ -29,9 +29,7 @@
   $: buttonEnabled = {
     left: $buttonConfig.find(b => b.name === 'left')?.enabled ?? false,
     right: $buttonConfig.find(b => b.name === 'right')?.enabled ?? false,
-    jump: $buttonConfig.find(b => b.name === 'jump')?.enabled ?? false,
-    a: $buttonConfig.find(b => b.name === 'a')?.enabled ?? false,
-    b: $buttonConfig.find(b => b.name === 'b')?.enabled ?? false
+    jump: $buttonConfig.find(b => b.name === 'jump')?.enabled ?? false
   };
 
   // Log when button config changes for debugging
@@ -93,19 +91,7 @@
     <div class="button-layout actions-right" role="group" aria-label="Action buttons">
       <div></div><div></div><div></div>
 
-      {#if buttonEnabled.b}
-        <button
-          id="btn-b"
-          class="button {$buttonStates.b ? 'pressed' : ''}"
-          on:mousedown={() => handleButtonDown('b')}
-          on:mouseup={() => handleButtonUp('b')}
-          on:touchstart|preventDefault={() => handleButtonDown('b')}
-          on:touchend|preventDefault={() => handleButtonUp('b')}
-          aria-label="B"
-        >B</button>
-      {:else}
-        <div></div>
-      {/if}
+      <div></div>
 
       {#if buttonEnabled.jump}
         <button
@@ -120,19 +106,7 @@
         <div></div>
       {/if}
 
-      {#if buttonEnabled.a}
-        <button
-          id="btn-a"
-          class="button {$buttonStates.a ? 'pressed' : ''}"
-          on:mousedown={() => handleButtonDown('a')}
-          on:mouseup={() => handleButtonUp('a')}
-          on:touchstart|preventDefault={() => handleButtonDown('a')}
-          on:touchend|preventDefault={() => handleButtonUp('a')}
-          aria-label="A"
-        >A</button>
-      {:else}
-        <div></div>
-      {/if}
+      <div></div>
       
       <div></div><div></div><div></div>
     </div>
@@ -154,18 +128,6 @@
     text-shadow: 0 0 2px rgba(0,0,0,0.7);
   }
 
-  /* base page reset */
-  html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    user-select: none;
-  }
-
-  .ctrl-hidden {
-    background-color: red;
-  }
-
   .container {
     padding: 18px;
     display: flex;
@@ -181,12 +143,6 @@
   h1 {
     margin: 0;
     font-size: 1.1rem;
-  }
-
-  .client-info {
-    font-size: 0.8rem;
-    color: #666;
-    margin-bottom: 6px;
   }
 
   /* Controller row */
@@ -258,10 +214,6 @@
 
   /* Make jump visually a little distinct (keeps same palette) */
   .jump { border-radius: 12px; font-size: 18px; }
-
-  /* Action-specific IDs kept for potential future color tweaks */
-  #btn-a { /* keep neutral – acts like original control button */ }
-  #btn-b { }
 
   /* Arrow-specific style (left/right) */
   .arrow-button { border-radius: 12px; font-size: 26px; }
