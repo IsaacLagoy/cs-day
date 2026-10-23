@@ -12,6 +12,10 @@ export class Player extends GameObject {
 
     canJump: boolean = false;
 
+    // Sprite state: -1 = facing left, 1 = facing right
+    facing: number = -1;
+    animTime: number = 0;
+
     constructor(clientId: string, role: string, position: vec2 = {x: 0, y: 0}, color='#fc4444ff', speed = 5) {
         super(position, {x: 1, y: 1}, color);
 
@@ -23,6 +27,8 @@ export class Player extends GameObject {
 
     update(deltaTime: number, do_gravity: boolean = true) {
         this.vel.x = this.speed * (Number(Boolean(this.inputs["right"])) - Number(Boolean(this.inputs["left"])));
+        if (this.vel.x !== 0) this.facing = Math.sign(this.vel.x);
+        this.animTime += deltaTime;
 
         if (do_gravity) this.vel.y -= deltaTime * GRAVITY;
 

@@ -6,12 +6,16 @@ import { GameObject } from './game_object';
 import { collide, getMTV } from './physics';
 import { MovingPlatform } from './moving_platform';
 import { Coin } from './coin';
+import { drawChicken, drawFlag, isGoal } from './sprites';
+
+type SceneStyle = 'default' | 'chicken';
 
 interface Scene {
     level: Level | null;
     slide: HTMLImageElement | null;
     mode: String;
     showQr?: boolean;
+    style?: SceneStyle;
 }
 
 // Game Rendering
@@ -20,14 +24,9 @@ let ctx: CanvasRenderingContext2D;
 let controllerInstance: GameViewController;
 let lastTime = 0;
 
-let slide_list: Array<HTMLImageElement | null>;
 let joinQrImage: HTMLImageElement | null = null;
 let slide_1: HTMLImageElement;
 let slide_2: HTMLImageElement;
-let slide_2_1: HTMLImageElement;
-let slide_2_2: HTMLImageElement;
-let slide_2_3: HTMLImageElement;
-let slide_2_4: HTMLImageElement;
 let slide_3: HTMLImageElement;
 let slide_4: HTMLImageElement;
 let slide_5: HTMLImageElement;
@@ -48,8 +47,6 @@ let princess_2: HTMLImageElement;
 
 let prev_level: Level | null;
 
-let level_list: Array<Level | null>;
-let test_level: Level;
 let level_1: Level;
 let level_2: Level;
 let level_3: Level;
@@ -62,12 +59,12 @@ let level_9: Level;
 let level_10: Level;
 let level_11: Level;
 let level_12: Level;
+let level_chicken: Level;
 let level_13: Level;
 let level_princess_start: Level;
 let level_princess_end: Level;
 let level_14: Level;
 let level_15: Level;
-let level_16: Level;
 let level_hole: Level;
 
 let scene_list: Scene[];
@@ -221,6 +218,7 @@ if (typeof window !== 'undefined') {
   level_11.add(level_11_left);
   level_11.add(level_11_right);
 
+  // Final vibe switch, this is when we change the style of everything
   level_12 = new Level();
   let level_12_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
   let level_12_mid = new GameObject({x: 0, y: 1}, {x: 3, y: 0.5}, "#dfdfdfff");
@@ -230,6 +228,11 @@ if (typeof window !== 'undefined') {
   level_12.add(level_12_mid);
   level_12.add(level_12_left);
   level_12.add(level_12_right);
+
+  // Style switch: same layout as level 2, but from here on players are chickens and goals get flags
+  level_chicken = new Level();
+  level_chicken.add(new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff"));
+  level_chicken.add(new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff"));
 
   level_13 = new Level();
   let level_13_floor_left = new GameObject({x: -6, y: -5}, {x: 8, y: 2}, "#dfdfdfff");
@@ -296,14 +299,16 @@ if (typeof window !== 'undefined') {
       {level: level_4, slide: null, mode: 'platformer'},
       {level: level_5, slide: null, mode: 'platformer'},
       {level: level_12, slide: null, mode: 'platformer'},
-      {level: level_9, slide: bg_1, mode: 'platformer'},
-      {level: level_10, slide: bg_2, mode: 'platformer'},
-      {level: level_11, slide: bg_3, mode: 'platformer'},
-      {level: level_princess_start, slide: princess_1, mode: 'platformer'},
-      {level: level_14, slide: bg_3, mode: 'platformer'},
-      {level: level_15, slide: slide_14, mode: 'platformer'},
-      {level: level_princess_end, slide: princess_2, mode: 'platformer'},
-      {level: level_13, slide: slide_13, mode: 'platformer'},
+      {level: level_9, slide: bg_1, mode: 'platformer', style: 'chicken'},
+      {level: level_10, slide: bg_2, mode: 'platformer', style: 'chicken'},
+      {level: level_11, slide: bg_3, mode: 'platformer', style: 'chicken'},
+      // Style switch: everything below uses chickens + flags
+      {level: level_chicken, slide: null, mode: 'platformer', style: 'chicken'},
+      {level: level_princess_start, slide: princess_1, mode: 'platformer', style: 'chicken'},
+      {level: level_14, slide: bg_3, mode: 'platformer', style: 'chicken'},
+      {level: level_15, slide: slide_14, mode: 'platformer', style: 'chicken'},
+      {level: level_princess_end, slide: princess_2, mode: 'platformer', style: 'chicken'},
+      {level: level_13, slide: slide_13, mode: 'platformer', style: 'chicken'},
     ]
 }
 
@@ -396,12 +401,27 @@ function draw() {
   if (scene_list[scene].slide) drawBackground(scene_list[scene].slide);
 
   if (scene_list[scene].mode !== 'none') {
-    if (scene_list[scene].level) scene_list[scene].level.draw(ctx, canvas.width, canvas.height);
+    const chickenStyle = scene_list[scene].style === 'chicken';
+    const level = scene_list[scene].level;
+
+    if (level) {
+      level.draw(ctx, canvas.width, canvas.height);
+
+      if (chickenStyle) {
+        level.objects.forEach(obj => {
+          if (isGoal(obj)) drawFlag(ctx, obj, canvas.width, canvas.height, lastTime * 0.001);
+        });
+      }
+    }
 
     const currentPlayers = get(controllerInstance.players);
 
     Object.values(currentPlayers).forEach(player => {
-      player.draw(ctx, canvas.width, canvas.height);
+      if (chickenStyle) {
+        drawChicken(ctx, player, canvas.width, canvas.height);
+      } else {
+        player.draw(ctx, canvas.width, canvas.height);
+      }
     });
   }
 

@@ -21,9 +21,16 @@ export class GameObject {
     }
 
     draw(ctx: CanvasRenderingContext2D, width: number, height: number) {
-        
+
         if (!this.do_draw) return;
 
+        const rect = this.screenRect(width, height);
+        ctx.fillStyle = this.color;
+        ctx.fillRect(rect.x, rect.y, rect.w, rect.h);
+    }
+
+    // On-screen rectangle (top-left corner + size) in canvas pixels
+    screenRect(width: number, height: number): { x: number; y: number; w: number; h: number; unit: number } {
         const tiles = 20;
         const imageAspect = 2560 / 1440;
 
@@ -37,8 +44,13 @@ export class GameObject {
         const center = {x: width / 2, y: height / 2};
         const offset = {x: center.x - this.scale.x * unit  / 2, y: center.y - this.scale.y * unit / 2}
         
-        ctx.fillStyle = this.color;
-        ctx.fillRect(offset.x + this.position.x * unit, offset.y - this.position.y * unit, this.scale.x * unit, this.scale.y * unit);
+        return {
+            x: offset.x + this.position.x * unit,
+            y: offset.y - this.position.y * unit,
+            w: this.scale.x * unit,
+            h: this.scale.y * unit,
+            unit,
+        };
     }
 
     calcCollider() {
