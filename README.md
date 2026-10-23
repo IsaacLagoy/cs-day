@@ -1,6 +1,6 @@
 # CS Day
 
-Created for Texas A&M's Computer Science Day to be presented by the Texas A&M Game Developers. This application is a fake Powerpoint slide presnetation that turns into a 2d platforming game. 
+Created for Texas A&M's Computer Science Day to be presented by the Texas A&M Game Developers. This application is a fake Powerpoint slide presentation that turns into a 2d platforming game. It covers educational content about game development while introducing those ideas live through the creation of a playable demo. 
 
 ## Run
 
