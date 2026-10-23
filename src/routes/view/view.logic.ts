@@ -56,8 +56,6 @@ let level_6: Level;
 let level_7: Level;
 let level_8: Level;
 let level_9: Level;
-let level_10: Level;
-let level_11: Level;
 let level_12: Level;
 let level_chicken: Level;
 let level_13: Level;
@@ -189,34 +187,14 @@ if (typeof window !== 'undefined') {
 
   // VIBE SWITCH
   level_9 = new Level();
-  let level_9_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#6c9affff");
-  let level_9_mid = new GameObject({x: 0, y: 1}, {x: 3, y: 0.5}, "#e4b746ff");
-  let level_9_left = new GameObject({x: -6, y: -2}, {x: 3, y: 0.5}, "#e4b746ff");
-  let level_9_right = new GameObject({x: 6, y: -2}, {x: 3, y: 0.5}, "#e4b746ff");
+  let level_9_floor = new GameObject({x: 0, y: -4.75}, {x: 20, y: 2}, "#6c9aff00");
+  let level_9_mid = new GameObject({x: 0, y: 0.45}, {x: 4, y: 0.9}, "#e4b74600");
+  let level_9_left = new GameObject({x: -6.5, y: -1.4}, {x: 3, y: 0.9}, "#e4b74600");
+  let level_9_right = new GameObject({x: 6.5, y: -1.4}, {x: 3, y: 0.9}, "#e4b74600");
   level_9.add(level_9_floor);
   level_9.add(level_9_mid);
   level_9.add(level_9_left);
   level_9.add(level_9_right);
-
-  level_10 = new Level();
-  let level_10_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#9a5a19ff");
-  let level_10_mid = new GameObject({x: 0, y: 1}, {x: 3, y: 0.5}, "#f8912aff");
-  let level_10_left = new GameObject({x: -6, y: -2}, {x: 3, y: 0.5}, "#f8912aff");
-  let level_10_right = new GameObject({x: 6, y: -2}, {x: 3, y: 0.5}, "#f8912aff");
-  level_10.add(level_10_floor);
-  level_10.add(level_10_mid);
-  level_10.add(level_10_left);
-  level_10.add(level_10_right);
-
-  level_11 = new Level();
-  let level_11_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#3eac3eff");
-  let level_11_mid = new GameObject({x: 0, y: 1}, {x: 3, y: 0.5}, "#926b45ff");
-  let level_11_left = new GameObject({x: -6, y: -2}, {x: 3, y: 0.5}, "#926b45ff");
-  let level_11_right = new GameObject({x: 6, y: -2}, {x: 3, y: 0.5}, "#926b45ff");
-  level_11.add(level_11_floor);
-  level_11.add(level_11_mid);
-  level_11.add(level_11_left);
-  level_11.add(level_11_right);
 
   // Final vibe switch, this is when we change the style of everything
   level_12 = new Level();
@@ -300,9 +278,9 @@ if (typeof window !== 'undefined') {
       {level: level_5, slide: null, mode: 'platformer'},
       {level: level_12, slide: null, mode: 'platformer'},
       {level: level_9, slide: bg_1, mode: 'platformer'},
-      {level: level_10, slide: bg_2, mode: 'platformer'},
-      {level: level_11, slide: bg_3, mode: 'platformer'},
-      {level: level_11, slide: bg_3, mode: 'platformer', style: 'chicken'},
+      {level: level_9, slide: bg_2, mode: 'platformer'},
+      {level: level_9, slide: bg_3, mode: 'platformer'},
+      {level: level_9, slide: bg_3, mode: 'platformer', style: 'chicken'},
       {level: level_princess_start, slide: princess_1, mode: 'platformer', style: 'chicken'},
       {level: level_14, slide: bg_3, mode: 'platformer', style: 'chicken'},
       {level: level_15, slide: slide_14, mode: 'platformer', style: 'chicken'},
@@ -452,7 +430,11 @@ function slideDrawRect(): { offsetX: number; offsetY: number; drawWidth: number;
 
 function drawBackground(image: HTMLImageElement) {
   const { offsetX, offsetY, drawWidth, drawHeight } = slideDrawRect();
+  // Nearest-neighbor scaling keeps pixel art crisp
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
   ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
+  ctx.restore();
 }
 
 function drawJoinQr(): void {
