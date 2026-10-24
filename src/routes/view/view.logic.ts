@@ -46,6 +46,7 @@ let princess_1: HTMLImageElement;
 let princess_2: HTMLImageElement;
 let princess_3: HTMLImageElement;
 let princess_4: HTMLImageElement;
+let princess_5: HTMLImageElement;
 
 let prev_level: Level | null;
 
@@ -67,6 +68,7 @@ let level_14: Level;
 let level_15: Level;
 let level_hole: Level;
 let level_16: Level;
+let level_17: Level;
 
 let scene_list: Scene[];
 
@@ -109,15 +111,16 @@ if (typeof window !== 'undefined') {
   bg_3.src = '/bg-3.png'; 
 
   princess_1 = new Image();
-  princess_1.src = '/forest_2.png'; 
+  princess_1.src = '/forest_wizard.png'; 
   princess_2 = new Image();
-  princess_2.src = '/princess-end.png'; 
+  princess_2.src = '/forest_princess.png'; 
   princess_3 = new Image();
   princess_3.src = '/forest_3.png'; 
   princess_4 = new Image();
   princess_4.src = '/forest_4.png'; 
+  princess_5 = new Image();
+  princess_5.src = '/forest_5.png'; 
 
-  
   level_1 = new Level();
   let level_1_floor = new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#dfdfdfff");
   level_1.add(level_1_floor);
@@ -233,11 +236,10 @@ if (typeof window !== 'undefined') {
   level_princess_start.add(new GameObject({x: 0, y: -4.75}, {x: 20, y: 2}, "#926b4500"));
   level_princess_start.add(new GameObject({x: 7, y: -4.25}, {x: 4, y: 1}, "#72e56c00"));
   level_princess_start.add(new Coin({x: 5, y: -2}));
-  level_princess_start.add(new Coin({x: 0, y: -2}));
+  level_princess_start.add(new Coin({x: -5, y: -2}));
 
   level_princess_end = new Level();
   level_princess_end.add(new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#926b45ff"));
-  level_princess_end.add(new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff"));
   let min_x = -5;
   let max_x = 5;
   let min_y = -3.5;
@@ -303,6 +305,17 @@ if (typeof window !== 'undefined') {
   level_16.add(level_16_coin_3);
   level_16.add(level_16_coin_4);
 
+  level_17 = new Level();
+  level_17.add(new GameObject({x: -8, y: -4.75}, {x: 3.8, y: 2}, "#926b4500"));
+  level_17.add(new GameObject({x: 0, y: -3.25}, {x: 3.8, y: 4.55}, "#926b4500"));
+  level_17.add(new GameObject({x: 8, y: -1.2}, {x: 3.8, y: 8}, "#72e56c00"));
+  level_17.add(new MovingPlatform({x: -4, y: -5.5}, {x: -4, y: -0.5}, 4, {x: 2, y: 0.5}, "#926b45ff"));
+  level_17.add(new MovingPlatform({x: 4, y: 3.5}, {x: 4, y: -2.5}, 4, {x: 2, y: 0.5}, "#926b45ff"));
+  level_17.add(new Coin({x: -4, y: -4}));
+  level_17.add(new Coin({x: -4, y: 3}));
+  level_17.add(new Coin({x: 4, y: -4}));
+  level_17.add(new Coin({x: 4, y: 3}));
+
   // define scenes
   scene_list = [
       {level: null, slide: slide_1, mode: 'none'},
@@ -328,6 +341,7 @@ if (typeof window !== 'undefined') {
       {level: level_9, slide: bg_3, mode: 'platformer'},
       {level: level_9, slide: bg_3, mode: 'platformer', style: 'chicken'},
       {level: level_princess_start, slide: princess_1, mode: 'platformer', style: 'chicken'},
+      {level: level_17, slide: princess_5, mode: 'platformer', style: 'chicken'},
       {level: level_16, slide: princess_4, mode: 'platformer', style: 'chicken'},
       {level: level_15, slide: slide_14, mode: 'platformer', style: 'chicken'},
       {level: level_14, slide: princess_3, mode: 'platformer', style: 'chicken'},
