@@ -3,7 +3,8 @@ import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import { connect, messages } from '$lib/realtime';
 import type { WebSocketConnection } from '$lib/realtime';
-import type { ButtonConfig, ButtonConfigMessage } from '$lib/types';
+import type { ButtonConfig, ButtonConfigMessage, SceneStyleMessage } from '$lib/types';
+import type { SceneStyle } from '$lib/scenes';
 
 export type ButtonName = 'jump' | 'left' | 'right';
 
@@ -11,6 +12,7 @@ export class ControllerLogic {
   ws: WebSocketConnection | undefined;
   buttonStates: Writable<Record<ButtonName, boolean>>;
   buttonConfig: Writable<ButtonConfig[]>;
+  sceneStyle: Writable<SceneStyle>;
   private unsubscribeMessages: (() => void) | undefined;
   private lastProcessedMessageCount: number = 0;
 
@@ -27,6 +29,8 @@ export class ControllerLogic {
       { name: 'right', enabled: true },
       { name: 'jump', enabled: false }
     ]);
+
+    this.sceneStyle = writable('default');
   }
 
   connect(savedId?: string): void {
@@ -68,6 +72,14 @@ export class ControllerLogic {
             console.log('[ControllerLogic] Button config now:', currentConfig);
           }
           
+          // Apply the latest scene style from the host
+          const styleMessages = newMessages.filter(
+            (msg): msg is SceneStyleMessage => msg.type === 'sceneStyle'
+          );
+          if (styleMessages.length > 0) {
+            this.sceneStyle.set(styleMessages[styleMessages.length - 1].style);
+          }
+
           // Update the last processed count
           this.lastProcessedMessageCount = currentCount;
         }

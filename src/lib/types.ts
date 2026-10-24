@@ -1,3 +1,5 @@
+import type { SceneStyle } from './scenes';
+
 /* Networking */
 export interface ConnectedClient {
     clientId: string;
@@ -51,6 +53,13 @@ export interface ButtonConfigRequestMessage {
     role: string;
 }
 
+export interface SceneStyleMessage {
+    type: 'sceneStyle';
+    clientId: string;
+    role: string;
+    style: SceneStyle;
+}
+
 export interface PresenceMessage {
     type: 'presence';
     clients: ConnectedClient[];
@@ -61,6 +70,7 @@ export type Message =
     | PlayerInputMessage
     | ButtonConfigMessage
     | ButtonConfigRequestMessage
+    | SceneStyleMessage
     | PresenceMessage;
 
 /* Physics */

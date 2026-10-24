@@ -1,12 +1,14 @@
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 import type { ButtonConfig, ConnectedClient, Message } from '$lib/types';
+import type { SceneStyle } from '$lib/scenes';
 
 export interface WebSocketConnection {
   send: (gameStateUpdate: Record<string, any>) => void;
   sendInput: (button: string, pressed: boolean) => void;
   sendButtonConfig: (buttons: ButtonConfig[]) => void;
   requestButtonConfig: () => void;
+  sendSceneStyle: (style: SceneStyle) => void;
   clientId: string;
   disconnect: () => Promise<void>;
 }
@@ -180,5 +182,9 @@ export function connect(role: string, existingId?: string): WebSocketConnection 
     sendRaw({ type: 'buttonConfigRequest', clientId: id, role });
   }
 
-  return { send, sendInput, sendButtonConfig, requestButtonConfig, clientId: id, disconnect };
+  function sendSceneStyle(style: SceneStyle): void {
+    sendRaw({ type: 'sceneStyle', clientId: id, role, style });
+  }
+
+  return { send, sendInput, sendButtonConfig, requestButtonConfig, sendSceneStyle, clientId: id, disconnect };
 }

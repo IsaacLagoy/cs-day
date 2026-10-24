@@ -19,7 +19,10 @@ const COIN_DRAW_SCALE = 1.6;
 // at 2x the player's hitbox to make the chicken roughly match it.
 const CHICKEN_DRAW_SCALE = 2;
 const FLAG_SIZE_UNITS = 2;
-const TINT_STRENGTH = 0.6;
+// Feather colors in chicken.png that get swapped for the player's color
+const CHICKEN_BODY = 255;   // pure white
+const CHICKEN_SHADOW = 230; // light grey shading
+const SHADOW_DARKEN = 0.8;  // shadow = player color * this
 
 const GOAL_COLOR = '#72e56c';
 
@@ -48,7 +51,18 @@ export function isGoal(obj: GameObject): boolean {
     return obj.color.toLowerCase().startsWith(GOAL_COLOR);
 }
 
-// Chicken sheet tinted toward a player's color (cached per color)
+// Turn any CSS color string into [r, g, b] by letting the canvas parse it
+function cssToRgb(color: string): [number, number, number] {
+    const c = document.createElement('canvas');
+    c.width = c.height = 1;
+    const x = c.getContext('2d')!;
+    x.fillStyle = color;
+    x.fillRect(0, 0, 1, 1);
+    const [r, g, b] = x.getImageData(0, 0, 1, 1).data;
+    return [r, g, b];
+}
+
+// Chicken sheet with its white feathers recolored to the player's color (cached per color)
 function tintedChicken(color: string): HTMLCanvasElement | null {
     if (!ready(chickenSheet)) return null;
 
@@ -58,29 +72,69 @@ function tintedChicken(color: string): HTMLCanvasElement | null {
     const w = chickenSheet.naturalWidth;
     const h = chickenSheet.naturalHeight;
 
-    // Multiply the color over the sheet, keeping the sheet's transparency
-    const multiplied = document.createElement('canvas');
-    multiplied.width = w;
-    multiplied.height = h;
-    const m = multiplied.getContext('2d')!;
-    m.drawImage(chickenSheet, 0, 0);
-    m.globalCompositeOperation = 'multiply';
-    m.fillStyle = color;
-    m.fillRect(0, 0, w, h);
-    m.globalCompositeOperation = 'destination-in';
-    m.drawImage(chickenSheet, 0, 0);
-
-    // Blend with the original so dark player colors stay readable
     const out = document.createElement('canvas');
     out.width = w;
     out.height = h;
-    const o = out.getContext('2d')!;
+    const o = out.getContext('2d', { willReadFrequently: true })!;
     o.drawImage(chickenSheet, 0, 0);
-    o.globalAlpha = TINT_STRENGTH;
-    o.drawImage(multiplied, 0, 0);
+
+    const [r, g, b] = cssToRgb(color);
+    const shadow = [r, g, b].map(v => Math.round(v * SHADOW_DARKEN));
+
+    const img = o.getImageData(0, 0, w, h);
+    const px = img.data;
+    for (let i = 0; i < px.length; i += 4) {
+        if (px[i + 3] === 0) continue;
+        const gray = px[i];
+        if (px[i + 1] !== gray || px[i + 2] !== gray) continue;
+
+        if (gray === CHICKEN_BODY) {
+            px[i] = r; px[i + 1] = g; px[i + 2] = b;
+        } else if (gray === CHICKEN_SHADOW) {
+            px[i] = shadow[0]; px[i + 1] = shadow[1]; px[i + 2] = shadow[2];
+        }
+    }
+    o.putImageData(img, 0, 0);
 
     tintCache.set(color, out);
     return out;
+}
+
+// Image URL of a single recolored chicken (first idle frame, trimmed to the bird).
+// Used by the phone controller to show "Your Chicken".
+export async function chickenPortrait(color: string): Promise<string | null> {
+    const img = chickenSheet;
+    if (!img) return null;
+    if (!(img.complete && img.naturalWidth > 0)) {
+        try {
+            await img.decode();
+        } catch {
+            return null;
+        }
+    }
+    const sheet = tintedChicken(color);
+    if (!sheet) return null;
+
+    const frame = sheet.getContext('2d', { willReadFrequently: true })!.getImageData(0, 0, FRAME, FRAME);
+
+    // Find the bounding box of the visible pixels
+    let minX = FRAME, minY = FRAME, maxX = -1, maxY = -1;
+    for (let y = 0; y < FRAME; y++) {
+        for (let x = 0; x < FRAME; x++) {
+            if (frame.data[(y * FRAME + x) * 4 + 3] === 0) continue;
+            minX = Math.min(minX, x); maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+        }
+    }
+    if (maxX < 0) return null;
+
+    const w = maxX - minX + 1;
+    const h = maxY - minY + 1;
+    const out = document.createElement('canvas');
+    out.width = w;
+    out.height = h;
+    out.getContext('2d')!.drawImage(sheet, minX, minY, w, h, 0, 0, w, h);
+    return out.toDataURL();
 }
 
 export function drawChicken(ctx: CanvasRenderingContext2D, player: Player, width: number, height: number) {

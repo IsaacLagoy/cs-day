@@ -3,9 +3,13 @@
   import { clientId } from '$lib/realtime';
   import { ControllerLogic } from './controller.logic';
   import type { ButtonName } from './controller.logic';
+  import { chickenPortrait } from '../view/sprites';
 
   const controller = new ControllerLogic();
-  const { buttonStates, buttonConfig } = controller;
+  const { buttonStates, buttonConfig, sceneStyle } = controller;
+
+  // Frames in /assets/buttons.png (16x16 each, unpressed then pressed)
+  const BUTTON_FRAME: Record<ButtonName, number> = { right: 0, left: 2, jump: 4 };
 
   onMount(() => {
     const savedId = localStorage.getItem('clientId');
@@ -40,15 +44,44 @@
 
   // reactive color variable
   $: color = $clientId ? '#' + $clientId.slice(0, 6) : '#000000';
+
+  $: chicken = $sceneStyle === 'chicken';
+
+  // Picture of this player's recolored chicken
+  let chickenSrc: string | null = null;
+  $: if (chicken && $clientId) {
+    const forColor = color;
+    chickenPortrait(forColor).then(src => {
+      if (forColor === color) chickenSrc = src;
+    });
+  }
+
+  // Class and sprite frame for a button, depending on the style
+  function buttonClass(button: ButtonName, pressed: boolean, chicken: boolean): string {
+    if (chicken) return 'sprite';
+    return pressed ? 'pressed' : '';
+  }
+  function spriteFrame(button: ButtonName, pressed: boolean): string {
+    return `--frame: ${BUTTON_FRAME[button] + (pressed ? 1 : 0)}`;
+  }
 </script>
 
 <div class="container">
-  <h1>Your Color</h1>
-  {#if $clientId}
-    <div class="color-box" style="background-color: {color};">
-    </div>
+  {#if chicken}
+    <h1>Your Chicken</h1>
+    {#if chickenSrc}
+      <img class="chicken" src={chickenSrc} alt="Your chicken" />
+    {:else}
+      <p>Loading chicken...</p>
+    {/if}
   {:else}
-    <p>Loading color...</p>
+    <h1>Your Color</h1>
+    {#if $clientId}
+      <div class="color-box" style="background-color: {color};">
+      </div>
+    {:else}
+      <p>Loading color...</p>
+    {/if}
   {/if}
 
   <div class="controller-pad">
@@ -58,13 +91,14 @@
 
       {#if buttonEnabled.left}
         <button
-          class="button arrow-button left {$buttonStates.left ? 'pressed' : ''}"
+          class="button arrow-button left {buttonClass('left', $buttonStates.left, chicken)}"
+          style={chicken ? spriteFrame('left', $buttonStates.left) : ''}
           on:mousedown={() => handleButtonDown('left')}
           on:mouseup={() => handleButtonUp('left')}
           on:touchstart|preventDefault={() => handleButtonDown('left')}
           on:touchend|preventDefault={() => handleButtonUp('left')}
           aria-label="Left"
-        >◀</button>
+        >{chicken ? '' : '◀'}</button>
       {:else}
         <div></div>
       {/if}
@@ -73,13 +107,14 @@
 
       {#if buttonEnabled.right}
         <button
-          class="button arrow-button right {$buttonStates.right ? 'pressed' : ''}"
+          class="button arrow-button right {buttonClass('right', $buttonStates.right, chicken)}"
+          style={chicken ? spriteFrame('right', $buttonStates.right) : ''}
           on:mousedown={() => handleButtonDown('right')}
           on:mouseup={() => handleButtonUp('right')}
           on:touchstart|preventDefault={() => handleButtonDown('right')}
           on:touchend|preventDefault={() => handleButtonUp('right')}
           aria-label="Right"
-        >▶</button>
+        >{chicken ? '' : '▶'}</button>
       {:else}
         <div></div>
       {/if}
@@ -95,13 +130,14 @@
 
       {#if buttonEnabled.jump}
         <button
-          class="button jump {$buttonStates.jump ? 'pressed' : ''}"
+          class="button jump {buttonClass('jump', $buttonStates.jump, chicken)}"
+          style={chicken ? spriteFrame('jump', $buttonStates.jump) : ''}
           on:mousedown={() => handleButtonDown('jump')}
           on:mouseup={() => handleButtonUp('jump')}
           on:touchstart|preventDefault={() => handleButtonDown('jump')}
           on:touchend|preventDefault={() => handleButtonUp('jump')}
           aria-label="Jump"
-        >▲</button>
+        >{chicken ? '' : '▲'}</button>
       {:else}
         <div></div>
       {/if}
@@ -210,6 +246,36 @@
     background: #4CAF50 !important;
     color: white !important;
     border-color: #45a049 !important;
+  }
+
+  /* Chicken style: buttons drawn from the /assets/buttons.png sprite sheet */
+  .chicken {
+    height: 100px;
+    image-rendering: pixelated;
+    margin-bottom: 12px;
+  }
+
+  .button.sprite,
+  .button.sprite:active {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    background-image: url('/assets/buttons.png');
+    background-size: 600% 100%;
+    background-position: calc(var(--frame) * 20%) 0;
+    image-rendering: pixelated;
+    transform: none;
+    /* Swap frames instantly instead of animating between them */
+    transition: none;
+  }
+
+  /* A bit bigger than the regular buttons; multiples of 16 keep the pixels crisp.
+     Set without :active so pressing never changes the size. */
+  .button.sprite { width: 96px; height: 96px; }
+
+  @media (orientation: portrait) {
+    .button.sprite,
+    .button.sprite:active { width: 80px; height: 80px; }
   }
 
   /* Make jump visually a little distinct (keeps same palette) */

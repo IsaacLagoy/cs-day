@@ -21,6 +21,9 @@ let lastButtonConfig: ButtonConfig[] = [
 	{ name: 'jump', enabled: false }
 ];
 
+// Latest scene style from the host, replayed to controllers that join later
+let lastSceneStyle: string = 'default';
+
 function requestOrigin(req: IncomingMessage): string | null {
 	const host = req.headers.host;
 	if (!host) return null;
@@ -89,6 +92,16 @@ function handleMessage(from: Client, raw: string): void {
 		return;
 	}
 
+	if (msg.type === 'sceneStyle') {
+		if (typeof msg.style === 'string') {
+			lastSceneStyle = msg.style;
+		}
+		for (const client of clientsWithRole('controller')) {
+			sendJson(client.ws, tagged);
+		}
+		return;
+	}
+
 	if (msg.type === 'buttonConfigRequest') {
 		for (const client of clientsWithRole('host')) {
 			sendJson(client.ws, tagged);
@@ -131,6 +144,9 @@ function onSocket(ws: WebSocket): void {
 						role: 'host',
 						buttons: lastButtonConfig
 					});
+				}
+				if (hello.role === 'controller') {
+					sendJson(ws, { type: 'sceneStyle', clientId: 'server', role: 'host', style: lastSceneStyle });
 				}
 				broadcastPresence();
 			} catch {

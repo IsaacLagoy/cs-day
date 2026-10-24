@@ -6,10 +6,9 @@ import { GameObject } from './game_object';
 import { collide, getMTV } from './physics';
 import { MovingPlatform } from './moving_platform';
 import { Coin } from './coin';
-import { NUM_SCENES } from '$lib/scenes';
+import { NUM_SCENES, sceneStyle, type SceneStyle } from '$lib/scenes';
 import { drawChicken, drawCloudPlatform, drawCoin, drawFlag, isGoal } from './sprites';
 
-type SceneStyle = 'default' | 'chicken';
 
 interface Scene {
     level: Level | null;
@@ -339,6 +338,11 @@ if (typeof window !== 'undefined') {
   if (scene_list.length !== NUM_SCENES) {
     console.warn(`[view] scene_list has ${scene_list.length} scenes but NUM_SCENES is ${NUM_SCENES}. Update src/lib/scenes.ts.`);
   }
+  scene_list.forEach((s, i) => {
+    if ((s.style ?? 'default') !== sceneStyle(i)) {
+      console.warn(`[view] Scene ${i} style is "${s.style ?? 'default'}" but src/lib/scenes.ts says "${sceneStyle(i)}". Controllers will show the wrong style.`);
+    }
+  });
 }
 
 

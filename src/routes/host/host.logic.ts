@@ -5,7 +5,7 @@ import type { ButtonConfig } from '$lib/types';
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
-import { NUM_SCENES } from '$lib/scenes';
+import { NUM_SCENES, sceneStyle } from '$lib/scenes';
 
 export class HostLogic {
   ws: WebSocketConnection | undefined;
@@ -75,6 +75,13 @@ export class HostLogic {
     });
   }
 
+  // Send the current scene to the view, and its style to the controllers
+  private sendScene(): void {
+    if (!this.ws) return;
+    this.setFlag('scene', this.scene);
+    this.ws.sendSceneStyle(sceneStyle(this.scene));
+  }
+
   toggleButton(buttonName: string): void {
     console.log('[HostLogic] Toggling button:', buttonName);
     this.buttonConfig.update(config => {
@@ -138,7 +145,7 @@ export class HostLogic {
       return;
     }
     this.scene = 0;
-    this.setFlag('scene', this.scene);
+    this.sendScene();
   }
 
   incScene(): void {
@@ -147,7 +154,7 @@ export class HostLogic {
       return;
     }
     this.scene = Math.min(this.scene + 1, NUM_SCENES - 1);
-    this.setFlag('scene', this.scene);
+    this.sendScene();
   }
 
   decScene(): void {
@@ -156,7 +163,7 @@ export class HostLogic {
       return;
     }
     this.scene = Math.max(this.scene - 1, 0);
-    this.setFlag('scene', this.scene);
+    this.sendScene();
   }
 
   resetSlide(): void {
