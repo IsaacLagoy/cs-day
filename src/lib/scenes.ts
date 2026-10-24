@@ -6,10 +6,10 @@ export type SceneStyle = 'default' | 'chicken';
 
 // Number of entries in scene_list. Update this when adding or removing scenes
 // so the host arrows stop at the right place.
-export const NUM_SCENES = 28;
+export const NUM_SCENES = 29;
 
 // Scene indexes that use the chicken style
-const CHICKEN_SCENES = new Set([21, 22, 23, 24, 25, 26, 27]);
+const CHICKEN_SCENES = new Set([21, 22, 23, 24, 25, 26, 27, 28]);
 
 export function sceneStyle(scene: number): SceneStyle {
   return CHICKEN_SCENES.has(scene) ? 'chicken' : 'default';
