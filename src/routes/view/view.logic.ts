@@ -6,7 +6,8 @@ import { GameObject } from './game_object';
 import { collide, getMTV } from './physics';
 import { MovingPlatform } from './moving_platform';
 import { Coin } from './coin';
-import { drawChicken, drawCloudPlatform, drawFlag, isGoal } from './sprites';
+import { NUM_SCENES } from '$lib/scenes';
+import { drawChicken, drawCloudPlatform, drawCoin, drawFlag, isGoal } from './sprites';
 
 type SceneStyle = 'default' | 'chicken';
 
@@ -44,6 +45,8 @@ let bg_2: HTMLImageElement;
 let bg_3: HTMLImageElement;
 let princess_1: HTMLImageElement;
 let princess_2: HTMLImageElement;
+let princess_3: HTMLImageElement;
+let princess_4: HTMLImageElement;
 
 let prev_level: Level | null;
 
@@ -64,6 +67,7 @@ let level_princess_end: Level;
 let level_14: Level;
 let level_15: Level;
 let level_hole: Level;
+let level_16: Level;
 
 let scene_list: Scene[];
 
@@ -106,9 +110,13 @@ if (typeof window !== 'undefined') {
   bg_3.src = '/bg-3.png'; 
 
   princess_1 = new Image();
-  princess_1.src = '/princess-start.png'; 
+  princess_1.src = '/forest_2.png'; 
   princess_2 = new Image();
   princess_2.src = '/princess-end.png'; 
+  princess_3 = new Image();
+  princess_3.src = '/forest_3.png'; 
+  princess_4 = new Image();
+  princess_4.src = '/forest_4.png'; 
 
   
   level_1 = new Level();
@@ -223,12 +231,24 @@ if (typeof window !== 'undefined') {
   level_13.add(level_13_coin_2);
 
   level_princess_start = new Level();
-  level_princess_start.add(new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#926b45ff"));
-  level_princess_start.add(new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff"));
+  level_princess_start.add(new GameObject({x: 0, y: -4.75}, {x: 20, y: 2}, "#926b4500"));
+  level_princess_start.add(new GameObject({x: 7, y: -4.25}, {x: 4, y: 1}, "#72e56c00"));
+  level_princess_start.add(new Coin({x: 5, y: -2}));
+  level_princess_start.add(new Coin({x: 0, y: -2}));
 
   level_princess_end = new Level();
   level_princess_end.add(new GameObject({x: 0, y: -5}, {x: 20, y: 2}, "#926b45ff"));
   level_princess_end.add(new GameObject({x: 7, y: -4.5}, {x: 4, y: 1}, "#72e56cff"));
+  let min_x = -5;
+  let max_x = 5;
+  let min_y = -3.5;
+  let max_y = 0;
+  let spacing = 1.0;
+  for (let x = min_x; x <= max_x; x += spacing) {
+    for (let y = min_y; y <= max_y; y += spacing) {
+      level_princess_end.add(new Coin({x: x, y: y}));
+    }
+  }
 
   // engine slide
   level_15 = new Level();
@@ -238,16 +258,20 @@ if (typeof window !== 'undefined') {
   level_15.add(new GameObject({x: 8.5, y: -5}, {x: 4, y: 6}, "#dfdfdfff"));
   level_15.add(new GameObject({x: 1.5, y: 0.5}, {x: 4, y: 0.5}, "#dfdfdfff"));
   level_15.add(new GameObject({x: 8.5, y: 3}, {x: 4, y: 1}, "#72e56cff"));
+  level_15.add(new Coin({x: 5, y: 4}));
+  level_15.add(new Coin({x: 5, y: 2}));
+  level_15.add(new Coin({x: -2, y: 2}));
+  level_15.add(new Coin({x: -4.5, y: -2}));
+  level_15.add(new Coin({x: 0.5, y: -2}));
 
-  // Narative Levels
   level_14 = new Level();
-  let level_14_start = new GameObject({x: -8.5, y: -3}, {x: 3, y: 10}, "#3eac3eff");
-  let level_14_platform_1 = new MovingPlatform({x: -6, y: -5.5}, {x: -6, y: 1.75}, 5, {x: 2, y: 0.5}, "#926b45ff");
-  let level_14_floor = new GameObject({x: -5, y: -6}, {x: 6, y: 2}, "#3eac3eff");
-  let level_14_wall = new GameObject({x: -4, y: 3}, {x: 2, y: 10}, "#3eac3eff");
-  let level_14_platform_2 = new MovingPlatform({x: 1, y: -5}, {x: 1, y: -1}, 4, {x: 2, y: 0.5}, "#926b45ff");
+  let level_14_start = new GameObject({x: -8.5, y: -3.1}, {x: 3, y: 10}, "#3eac3e00");
+  let level_14_platform_1 = new MovingPlatform({x: -6, y: -4.0}, {x: -6, y: 1.75}, 5, {x: 2, y: 0.5}, "#926b45ff");
+  let level_14_floor = new GameObject({x: -4.1, y: -4.75}, {x: 6, y: 2}, "#3eac3e00");
+  let level_14_wall = new GameObject({x: -3.5, y: 5.1}, {x: 2.8, y: 10}, "#3eac3e00");
+  let level_14_platform_2 = new MovingPlatform({x: 1, y: -3.5}, {x: 1, y: -0.5}, 4, {x: 2, y: 0.5}, "#926b45ff");
   let level_14_platform_3 = new MovingPlatform({x: 4, y: -1}, {x: 4, y: 1.75}, 2, {x: 2, y: 0.5}, "#926b45ff");
-  let level_14_end = new GameObject({x: 8.5, y: -2}, {x: 3, y: 10}, "#72e56cff");
+  let level_14_end = new GameObject({x: 8.5, y: -2.2}, {x: 3, y: 10}, "#72e56c00");
   level_14.add(level_14_start);
   level_14.add(level_14_platform_1);
   level_14.add(level_14_platform_2);
@@ -255,8 +279,31 @@ if (typeof window !== 'undefined') {
   level_14.add(level_14_floor);
   level_14.add(level_14_wall);
   level_14.add(level_14_end);
+  level_14.add(new Coin({x: -3.5, y: -1}));
+  level_14.add(new Coin({x: 4, y: -3}));
 
-  
+  level_16 = new Level();
+  let level_16_cliff = new GameObject({x: -3.0, y: 0.95}, {x: 14, y: 1.7}, "#3eac3e00");
+  let level_16_hover = new GameObject({x: 7.5, y: -1.25}, {x: 3, y: 1}, "#3eac3e00");
+  let level_16_left = new GameObject({x: -7.0, y: -4.65}, {x: 6, y: 1.7}, "#3eac3e00");
+  let level_16_right = new GameObject({x: 7.0, y: -4.65}, {x: 6, y: 1.7}, "#3eac3e00");
+  let level_16_mid = new GameObject({x: 0.0, y: -4.65}, {x: 2, y: 1.7}, "#3eac3e00");
+  let level_16_goal = new GameObject({x: -8.0, y: -4.25}, {x: 3, y: 1}, "#72e56c00");
+  let level_16_coin_1 = new Coin({x: 5.5, y: 4});
+  let level_16_coin_2 = new Coin({x: 9, y: -3});
+  let level_16_coin_3 = new Coin({x: 2.5, y: -1.5});
+  let level_16_coin_4 = new Coin({x: -2.5, y: -1.5});
+  level_16.add(level_16_cliff);
+  level_16.add(level_16_hover);
+  level_16.add(level_16_left);
+  level_16.add(level_16_right);
+  level_16.add(level_16_mid);
+  level_16.add(level_16_goal);
+  level_16.add(level_16_coin_1);
+  level_16.add(level_16_coin_2);
+  level_16.add(level_16_coin_3);
+  level_16.add(level_16_coin_4);
+
   // define scenes
   scene_list = [
       {level: null, slide: slide_1, mode: 'none'},
@@ -282,13 +329,23 @@ if (typeof window !== 'undefined') {
       {level: level_9, slide: bg_3, mode: 'platformer'},
       {level: level_9, slide: bg_3, mode: 'platformer', style: 'chicken'},
       {level: level_princess_start, slide: princess_1, mode: 'platformer', style: 'chicken'},
-      {level: level_14, slide: bg_3, mode: 'platformer', style: 'chicken'},
+      {level: level_16, slide: princess_4, mode: 'platformer', style: 'chicken'},
       {level: level_15, slide: slide_14, mode: 'platformer', style: 'chicken'},
+      {level: level_14, slide: princess_3, mode: 'platformer', style: 'chicken'},
       {level: level_princess_end, slide: princess_2, mode: 'platformer', style: 'chicken'},
       {level: level_13, slide: slide_13, mode: 'platformer', style: 'chicken'},
     ]
+
+  if (scene_list.length !== NUM_SCENES) {
+    console.warn(`[view] scene_list has ${scene_list.length} scenes but NUM_SCENES is ${NUM_SCENES}. Update src/lib/scenes.ts.`);
+  }
 }
 
+
+// Keep the scene index inside scene_list so an out-of-range value can't crash the loop
+function clampScene(scene: number): number {
+  return Math.max(0, Math.min(scene ?? 0, scene_list.length - 1));
+}
 
 // Initialize the canvas and start the game loop
 export function init(c: HTMLCanvasElement, controller: GameViewController) {
@@ -316,7 +373,7 @@ export function init(c: HTMLCanvasElement, controller: GameViewController) {
 function update(deltaTime: number) {
   const currentPlayers = get(controllerInstance.players);
   const gameState = get(controllerInstance.gameState);
-  let scene = gameState.scene;
+  let scene = clampScene(gameState.scene);
 
   const levelChange = prev_level !== scene_list[scene].level && scene_list[scene].level !== level_1;
   prev_level = scene_list[scene].level;
@@ -373,7 +430,7 @@ function draw() {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const gameState = get(controllerInstance.gameState);
-  let scene = gameState.scene;
+  let scene = clampScene(gameState.scene);
 
   if (scene_list[scene].slide) drawBackground(scene_list[scene].slide);
 
@@ -385,6 +442,7 @@ function draw() {
       if (chickenStyle) {
         level.objects.forEach(obj => {
           if (obj instanceof MovingPlatform) drawCloudPlatform(ctx, obj, canvas.width, canvas.height);
+          else if (obj instanceof Coin) drawCoin(ctx, obj, canvas.width, canvas.height, lastTime * 0.001);
           else obj.draw(ctx, canvas.width, canvas.height);
         });
         level.objects.forEach(obj => {

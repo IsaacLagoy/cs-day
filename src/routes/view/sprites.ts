@@ -9,6 +9,11 @@ const CHICKEN_IDLE_FPS = 2;
 const CHICKEN_WALK_FPS = 12;
 const FLAG_FRAMES = 9;
 const FLAG_FPS = 10;
+const COIN_FRAME = 16;
+const COIN_FRAMES = 6;
+const COIN_FPS = 10;
+// The coin fills ~10px of its 16px frame, so scale up to roughly match the hitbox
+const COIN_DRAW_SCALE = 1.6;
 
 // The chicken only fills the bottom ~half of its frame, so the frame is drawn
 // at 2x the player's hitbox to make the chicken roughly match it.
@@ -21,6 +26,7 @@ const GOAL_COLOR = '#72e56c';
 let chickenSheet: HTMLImageElement | null = null;
 let flagSheet: HTMLImageElement | null = null;
 let cloudPlatform: HTMLImageElement | null = null;
+let coinSheet: HTMLImageElement | null = null;
 const tintCache = new Map<string, HTMLCanvasElement>();
 
 if (typeof window !== 'undefined') {
@@ -30,6 +36,8 @@ if (typeof window !== 'undefined') {
     flagSheet.src = '/assets/flag.png';
     cloudPlatform = new Image();
     cloudPlatform.src = '/assets/cloud_platform.png';
+    coinSheet = new Image();
+    coinSheet.src = '/assets/coin_small_gold.png';
 }
 
 function ready(img: HTMLImageElement | null): img is HTMLImageElement {
@@ -131,5 +139,27 @@ export function drawCloudPlatform(ctx: CanvasRenderingContext2D, platform: GameO
     ctx.save();
     ctx.imageSmoothingEnabled = false;
     ctx.drawImage(cloudPlatform, rect.x, rect.y, rect.w, rect.h);
+    ctx.restore();
+}
+
+// Spinning coin sprite centered on the coin's hitbox (skipped once collected)
+export function drawCoin(ctx: CanvasRenderingContext2D, coin: GameObject, width: number, height: number, time: number) {
+    if (!coin.do_draw) return;
+    if (!ready(coinSheet)) {
+        coin.draw(ctx, width, height);
+        return;
+    }
+
+    const rect = coin.screenRect(width, height);
+    const size = rect.w * COIN_DRAW_SCALE;
+    const frame = Math.floor(time * COIN_FPS) % COIN_FRAMES;
+
+    ctx.save();
+    ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(
+        coinSheet,
+        frame * COIN_FRAME, 0, COIN_FRAME, COIN_FRAME,
+        rect.x + rect.w / 2 - size / 2, rect.y + rect.h / 2 - size / 2, size, size
+    );
     ctx.restore();
 }
